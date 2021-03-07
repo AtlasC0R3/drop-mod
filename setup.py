@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='drop-mod',
-      version='1.0',
+      version='0.1',
       description='A Python moderation toolkit built for chat bots',
       url='https://github.com/AtlasC0R3/drop-moderation',
       author='atlas_core',

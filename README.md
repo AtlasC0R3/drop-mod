@@ -1,12 +1,12 @@
 # Drop
-###### *also known as drop-moderation*
+###### *also known as drop-mod*
 Drop is a Python module focused on providing moderation commands for chat-bots (i.e. Discord, Matrix.org, etc.)
 ## How do I install/use it?
 Unfortunately I have not yet made this package a terminal app, so you'll have to use it in scripts (for example, [drop-discord](https://github.com/AtlasC0R3/drop-discord/))
 
 There are 2 ways: either cloning the GitHub repository, or using `pip`
 ### Cloning from GitHub
-1. Clone this repository, [by downloading this repository as a \*.zip file](https://github.com/AtlasC0R3/drop-moderation/archive/main.zip), [by cloning this repository using Git](https://github.com/AtlasC0R3/drop-moderation.git) or [by going into this repository's releases](https://github.com/AtlasC0R3/drop-moderation/releases) and downloading the latest release. If you download from this repository's release, you have the stable release. If you cloned this repository directly, you have a more "canary" release.
+1. Clone this repository, [by downloading this repository as a \*.zip file](https://github.com/AtlasC0R3/drop-mod/archive/main.zip), [by cloning this repository using Git](https://github.com/AtlasC0R3/drop-mod.git) or [by going into this repository's releases](https://github.com/AtlasC0R3/drop-mod/releases) and downloading the latest release. If you download from this repository's release, you have the stable release. If you cloned this repository directly, you have a more "canary" release.
 2. Run `setup.py` using your preferred Python installation
 ### Using `pip`
 1. Run `pip install drop-mod`

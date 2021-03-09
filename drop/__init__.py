@@ -4,6 +4,7 @@ import drop.ext
 import drop.moderation
 import drop.mute
 import drop.todo
+import drop.tempban
 
 
 def licenses():

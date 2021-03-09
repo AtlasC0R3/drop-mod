@@ -32,3 +32,7 @@ class NoMutesForGuild(Exception):
 
 class NoMutesForUser(Exception):
     """The user does not have any mutes."""
+
+
+class NoTempBansForGuild(Exception):
+    """The guild does not have any temp bans."""

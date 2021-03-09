@@ -8,9 +8,9 @@ setup(name='drop-mod',
       license='Apache 2.0',
       packages=['drop'],
       install_requires=[
-            "duckduckpy==0.2",
-            "lyricsgenius==3.0.0",
-            "parsedatetime==2.6"
+          "duckduckpy==0.2",
+          "lyricsgenius==3.0.0",
+          "parsedatetime==2.6"
       ],
       python_requires=">=3.7",
       zip_safe=False)

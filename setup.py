@@ -13,4 +13,4 @@ setup(name='drop-mod',
           "parsedatetime==2.6"
       ],
       python_requires=">=3.7",
-      zip_safe=False)
+      zip_safe=True)

@@ -23,6 +23,14 @@ owofy("The quick brown fox jumps over the lazy dog.")
 # no im not a furry shhHHHHHH.
 ```
 
+## F.A.Q.
+### Q: Are there any open images for this project?
+**A:** Yes, [they are updated in a Gitdab repository](https://gitdab.com/atlas_core/drop-misc/src/branch/master/images). *[License link](https://gitdab.com/atlas_core/drop-misc/src/branch/master/images/license.txt)*
+### Q: Can I use this for my own projects?
+**A:** Of course, it's a Python module! Just install it, set it up in your projects/scripts, and off you go! *note: this Python module still has a license, please make sure your project respects the license.*
+### ~~Q: who are you?~~
+~~**A:** a person why are you asking~~
+
 ### Dependencies
 **None of these packages listed below are included directly into this software!** They are only installed from [PyPI](https://pypi.org/) when running `setup.py`!
 

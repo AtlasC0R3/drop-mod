@@ -34,8 +34,16 @@ def licenses():
             "license": "Apache 2.0",
             "link": "https://github.com/bear/parsedatetime/blob/master/LICENSE.txt",
             "changes": "no changes made"
+        },
+        {
+            "name": "Dear PyGui",
+            "license": "MIT License",
+            "link": "https://github.com/hoffstadt/DearPyGui/blob/master/LICENSE",
+            "changes": None
         }
     ]
+    # If you installed these from PyPI directly (or just ran setup.py or pip to install this), then no changes have been
+    # made, so you don't need to stress out about that.
     license_str = ""
     for dep in license_list:
         to_add = f"{dep['name']}, licensed under {dep['license']}"

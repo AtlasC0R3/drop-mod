@@ -6,6 +6,8 @@ import drop.mute
 import drop.todo
 import drop.tempban
 
+__version__ = "0.3a"
+
 
 def licenses():
     license_list = [

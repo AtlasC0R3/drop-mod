@@ -1,2 +1,7 @@
 .venv/
 .idea/
+
+drop_mod.egg-info/
+build/
+dist/
+# build directories

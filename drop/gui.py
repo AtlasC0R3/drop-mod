@@ -76,6 +76,39 @@ class Rules:
                            default_value=def_val)
 
 
+class Guilds:
+    @staticmethod
+    def get_warned_users(sender, data):
+        # data is guild id.
+        data = int(data)  # so that it's an actual ID, grr.
+        window_name = f"Warns for guild {data}"
+        if window_name in get_windows():
+            delete_item(window_name)
+        with window(window_name, no_title_bar=False, autosize=False, no_resize=False,
+                    no_close=False, no_move=False):
+            user_list = drop.finder.find_warns(data)
+            if not user_list:
+                add_text("There are no warned users in this guild.", color=[255, 0, 0])
+                return
+            for user in user_list:
+                if f"Warns for user {user}" in get_windows():
+                    thing_name = f"Warns for user {user}"
+                    delete_item(thing_name, children_only=True)
+                    delete_item(thing_name)
+                warn_data = drop.moderation.get_warns(data, user)
+                warns = warn_data.get('warns')
+                with collapsing_header(f'all_warns##{user}', label=f"{warn_data.get('offender_name')} ({data})"):
+                    for index, warn in enumerate(warns):
+                        add_text(f"{warn.get('reason')}\n"
+                                 f"warned by {warn.get('warner_name')} (id: {warn.get('warner')}), "
+                                 f"in channel {warn.get('channel')}, warned on {warn.get('datetime')}")
+                        add_button(f"{user}_del_warn##{index}", callback=Warns.delete_warn, callback_data=[
+                            data, user, f'{index}'  # you gotta do some out-of-the-box thinking.
+                        ], label="Delete warn")
+                        add_text(f"{user}_deleted_warn##{index}", default_value="Deleted warn.", show=False)
+                        add_spacing()
+
+
 class Warns:
     @staticmethod
     def update_offender_name(sender, data):
@@ -122,9 +155,14 @@ class Warns:
                 show_item("warn_no_warns")
                 return
             parent = f"Warns for user {warns.get('offender_name')}"
-            if parent in get_windows():
+            window_list = get_windows()
+            if parent in window_list:
                 delete_item(parent, children_only=True)
                 delete_item(parent)
+            if f"Warns for guild {guild_id}" in window_list:
+                thing_name = f"Warns for guild {guild_id}"
+                delete_item(thing_name, children_only=True)
+                delete_item(thing_name)
             with window(parent, no_title_bar=False, autosize=True, no_resize=False, no_close=False, no_move=False,
                         on_close=lambda: delete_item(parent)):
                 for index, warn in enumerate(warns.get("warns")):
@@ -134,11 +172,13 @@ class Warns:
                     add_button(f"{offender_id}_del_warn##{index}", callback=Warns.delete_warn, callback_data=[
                         guild_id, offender_id, f'{index}'  # you gotta do some out-of-the-box thinking.
                     ], label="Delete warn")
+                    add_text(f"{offender_id}_deleted_warn##{index}", default_value="Deleted warn.", show=False)
                     add_spacing()
 
     @staticmethod
     def delete_warn(sender, data):
         drop.moderation.remove_warn(data[0], data[1], int(data[2]))
+        show_item(f"{data[1]}_deleted_warn##{data[2]}")
 
 
 class GuiStuff:
@@ -261,6 +301,14 @@ def start_gui():
                 no_close=True, no_move=False):
         for guild in drop.finder.find_guilds():
             add_text(guild)
+            add_button(f"{guild}_show_warns", callback=Guilds.get_warned_users, callback_data=f'{guild}',
+                       label="Show all warns")
+            add_same_line(spacing=5)
+            # TODO: finish rules stuff
+            # ? should we just imitate the regular rule window, like the "Show all warns" thing?
+            # ? that seems like the most strategic option.
+            add_button(f"{guild}_show_rules", callback=Guilds.get_warned_users, callback_data=f'{guild}',
+                       label="Show all warns")
             add_spacing(count=1)
         add_text('stored_guilds_text_thingy_i_guess', default_value="I don't have any ideas on how to make this window "
                                                                     "look better.")

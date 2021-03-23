@@ -155,7 +155,8 @@ class GuiStuff:
 
 
 def start_gui():
-    with window('main', label="How the hell did you get here?!"):
+    with window('main', label="If you're reading this you tinkered with the wrong thing."):
+        # doesn't apply if you're seeing the source code.
         with menu_bar("Main Menu Bar"):
             with menu("Debug"):
                 add_menu_item("About Dear PyGui", callback=show_about)

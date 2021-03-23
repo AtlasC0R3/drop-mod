@@ -5,6 +5,7 @@ import drop.moderation
 import drop.mute
 import drop.todo
 import drop.tempban
+import drop.finder
 
 __version__ = "0.3a"
 

@@ -1,6 +1,5 @@
 import os
 
-
 try:
     from dearpygui.core import *
     from dearpygui.simple import *
@@ -8,16 +7,21 @@ except ImportError:
     exit("Dear PyGui not installed, please run pip to install it.")
 from drop import *
 from random import randint
-
+import configparser
 
 print(f"Running in {os.getcwd()}")
 if not os.path.exists('data/'):
     print("No data/ directory! Are you sure you're running this GUI in the right directory?")
 
-
 window_margins = 150
 window_width = get_main_window_size()[0]
-window_height = get_main_window_size()[0]
+window_height = get_main_window_size()[1]  # how the fuck did I forget to set the index to 1
+config_filepath = 'data/guiconfig.ini'
+
+config = configparser.ConfigParser()
+config.read(config_filepath)
+if not config.has_section('position'):
+    config.add_section('position')
 
 
 class Rules:
@@ -153,6 +157,41 @@ class GuiStuff:
         set_theme("Dark Grey")  # other themes just look weird without this one being set first.
         set_theme(sender)
 
+    @staticmethod
+    def save_window_pos():
+        print("Saving window positions")
+        config.read(config_filepath)
+        for opened_window in get_windows():
+            if ('##' in opened_window) or (opened_window == 'main') or ('dialog' in opened_window) \
+                    or ('for' in opened_window):
+                pass
+            else:
+                window_pos = get_window_pos(opened_window)
+                pos_string = f'{window_pos[0]}x{window_pos[1]}'
+                config.set('position', opened_window.lower(), pos_string)
+                with open(config_filepath, 'w+') as f:
+                    config.write(f)
+
+    @staticmethod
+    def set_window_pos():
+        config.read(config_filepath)
+        for opened_window in get_windows():
+            if ('##' in opened_window) or (opened_window == 'main') or ('dialog' in opened_window) \
+                    or ('for' in opened_window):
+                pass
+            else:
+                try:
+                    position_str = config.get('position', opened_window)
+                except configparser.NoOptionError:
+                    # that window has not been saved yet.
+                    x_pos = randint(window_margins, int(window_height - window_margins))
+                    y_pos = randint(window_margins, int(window_width - window_margins))
+                else:
+                    saved_position = position_str.split('x')
+                    x_pos = int(saved_position[0])
+                    y_pos = int(saved_position[1])
+                set_window_pos(opened_window, x_pos, y_pos)
+
 
 def start_gui():
     with window('main', label="If you're reading this you tinkered with the wrong thing."):
@@ -177,21 +216,20 @@ def start_gui():
                 add_menu_item("Red", callback=GuiStuff.theme_callback)
             with menu("About"):
                 add_menu_item("About Drop", callback=GuiStuff.about_drop)
-    
+
     with window('Rules', no_title_bar=False, autosize=True, no_resize=True, no_close=True, no_move=False,
                 y_pos=randint(window_margins, int(window_height - window_margins)),
                 x_pos=randint(window_margins, int(window_width - window_margins))):
         add_input_text('rule_guild', label="Guild ID", on_enter=True, callback=Rules.show_rules)
         add_text('Incorrect guild.', color=[255, 0, 0], parent='Rules', show=False)
         add_button('Show rules', callback=Rules.show_rules)
-    
+
         add_button("Set rule", callback=Rules.do_rule_popup)
         add_same_line(spacing=10)
         add_input_text('Rule Key', on_enter=True, label="", callback=Rules.do_rule_popup)
         add_text('Invalid rule key.', color=[255, 0, 0], parent='Rules', show=False)
-    
-    with window('Warns', no_title_bar=False, autosize=True, no_resize=True, no_close=True, no_move=False,
-                y_pos=200, x_pos=randint(window_margins, int(window_width - window_margins))):
+
+    with window('Warns', no_title_bar=False, autosize=True, no_resize=True, no_close=True, no_move=False):
         add_input_text('warn_guild', label="Guild ID")
         add_text("warn_invalid_guild", default_value='Invalid guild ID.', color=[255, 0, 0],
                  parent='Warns', show=False)
@@ -211,7 +249,7 @@ def start_gui():
         add_text("warn_fill_all_the_fucking_fields", default_value='Please fill all of the fields.', color=[255, 0, 0],
                  parent='Warns', show=False)
         # I'm tired, gimme a break.
-    
+
         add_spacing()
         add_button("Show warns", callback=lambda: Warns.show_warns())
         add_same_line(spacing=5)
@@ -219,6 +257,8 @@ def start_gui():
         add_text("warn_no_warns", default_value='Offender has no warns', color=[255, 0, 0],
                  parent='Warns', show=False)
 
+    set_exit_callback(GuiStuff.save_window_pos)
+    GuiStuff.set_window_pos()
     start_dearpygui(primary_window="main")
 
 

@@ -257,6 +257,14 @@ def start_gui():
         add_text("warn_no_warns", default_value='Offender has no warns', color=[255, 0, 0],
                  parent='Warns', show=False)
 
+    with window('stored_guilds', label='Stored guilds', no_title_bar=False, autosize=True, no_resize=False,
+                no_close=True, no_move=False):
+        for guild in drop.finder.find_guilds():
+            add_text(guild)
+            add_spacing(count=1)
+        add_text('stored_guilds_text_thingy_i_guess', default_value="I don't have any ideas on how to make this window "
+                                                                    "look better.")
+
     set_exit_callback(GuiStuff.save_window_pos)
     GuiStuff.set_window_pos()
     start_dearpygui(primary_window="main")

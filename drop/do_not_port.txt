@@ -1,0 +1,42 @@
+commands from drop-discord that won't be ported to this standalone library
+
+
+8ball
+Relies on language stuff that I plan on keeping only for Discord.
+You get the same experience from using random.choice() anyways.
+
+embed
+Relies on Discord-only stuff
+
+ping
+Relies on Discord-only stuff. I could do some sort of "library ping" however.
+
+say
+What, do you expect me to do this?
+def say(to_repeat):
+    return to_repeat
+
+
+
+anonymouslogs
+It's Discord.py that handles that, and the thing that uses drop-mod should also be handling that.
+
+changelang
+Relies on language stuff that I plan on keeping only for Discord.
+
+inactivitychannel
+Relies on Discord-only stuff
+
+muted_role
+Discord-only stuff ghffghjfkhgfjkgnjhgbdfhbgjdhfbgjhdbgffdg
+
+setprefix
+read above
+
+toggle*
+hhhh
+
+
+
+ban, unban, kick, purge, storepins
+Discord-only stuff yet again. Anyone surprised? Because you shouldn't be.

@@ -27,7 +27,10 @@ if not config.has_section('position'):
 class Rules:
     @staticmethod
     def show_rules(sender, data):
-        guild_id = get_value("rule_guild")
+        if data:
+            guild_id = int(data)
+        else:
+            guild_id = get_value("rule_guild")
         parent = f"Rules for {guild_id}"
         rules = []
         if parent in get_windows():
@@ -304,14 +307,11 @@ def start_gui():
             add_button(f"{guild}_show_warns", callback=Guilds.get_warned_users, callback_data=f'{guild}',
                        label="Show all warns")
             add_same_line(spacing=5)
-            # TODO: finish rules stuff
-            # ? should we just imitate the regular rule window, like the "Show all warns" thing?
-            # ? that seems like the most strategic option.
-            add_button(f"{guild}_show_rules", callback=Guilds.get_warned_users, callback_data=f'{guild}',
-                       label="Show all warns")
+            add_button(f"{guild}_show_rules", callback=Rules.show_rules, callback_data=f'{guild}',
+                       label="Show all rules")
             add_spacing(count=1)
         add_text('stored_guilds_text_thingy_i_guess', default_value="I don't have any ideas on how to make this window "
-                                                                    "look better.")
+                                                                    "look better.")  # self esteem 100%
 
     set_exit_callback(GuiStuff.save_window_pos)
     GuiStuff.set_window_pos()

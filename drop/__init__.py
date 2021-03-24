@@ -7,7 +7,7 @@ import drop.todo
 import drop.tempban
 import drop.finder
 
-__version__ = "0.3a"
+__version__ = "0.3"
 
 
 def licenses():

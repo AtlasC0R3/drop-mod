@@ -6,6 +6,7 @@ try:
 except ImportError:
     exit("Dear PyGui not installed, please run pip to install it.")
 from drop import *
+from drop import moderation, errors, finder, __version__
 from random import randint
 import configparser
 
@@ -36,13 +37,13 @@ class Rules:
         if parent in get_windows():
             delete_item(parent)
         try:
-            # for key, value in drop.moderation.get_rules(guild_id).sort().items():
-            for key, value in {key: value for key, value in sorted(drop.moderation.get_rules(guild_id).items(),
+            # for key, value in moderation.get_rules(guild_id).sort().items():
+            for key, value in {key: value for key, value in sorted(moderation.get_rules(guild_id).items(),
                                                                    key=lambda item: item[0])}.items():
                 # That way, stuff is sorted by keys. If you really wanted to, you could change item[0] to item[1]
                 # if you wanted to sort by value.
                 rules.append(f"{key}: {value}")
-        except drop.errors.NoRulesError:
+        except errors.NoRulesError:
             show_item("Incorrect guild.")
         else:
             with window(parent, no_title_bar=False, autosize=False, no_resize=False, no_close=False, no_move=False):
@@ -54,7 +55,7 @@ class Rules:
         guild_id = get_value("rule_guild")
         rule_key = get_value('Rule Key').lower()
         rule_value = get_value("Rule Value")
-        drop.moderation.set_rule(guild_id, rule_key, rule_value)
+        moderation.set_rule(guild_id, rule_key, rule_value)
         delete_item("Rule description window")
 
     @staticmethod
@@ -72,7 +73,7 @@ class Rules:
         with window(f"Rule description window", no_title_bar=False, autosize=True, no_resize=False,
                     no_close=False, no_move=False):
             add_text('Rule description:')
-            def_val = drop.moderation.get_rule(guild_id, rule_key)
+            def_val = moderation.get_rule(guild_id, rule_key)
             if not def_val:
                 def_val = ""
             add_input_text('Rule Value', label="", on_enter=True, callback=Rules.set_rule,
@@ -89,7 +90,7 @@ class Guilds:
             delete_item(window_name)
         with window(window_name, no_title_bar=False, autosize=False, no_resize=False,
                     no_close=False, no_move=False):
-            user_list = drop.finder.find_warns(data)
+            user_list = finder.find_warns(data)
             if not user_list:
                 add_text("There are no warned users in this guild.", color=[255, 0, 0])
                 return
@@ -98,7 +99,7 @@ class Guilds:
                     thing_name = f"Warns for user {user}"
                     delete_item(thing_name, children_only=True)
                     delete_item(thing_name)
-                warn_data = drop.moderation.get_warns(data, user)
+                warn_data = moderation.get_warns(data, user)
                 warns = warn_data.get('warns')
                 with collapsing_header(f'all_warns##{user}', label=f"{warn_data.get('offender_name')} ({data})"):
                     for index, warn in enumerate(warns):
@@ -117,7 +118,7 @@ class Warns:
     def update_offender_name(sender, data):
         guild_id = get_value("warn_guild")
         offender_id = get_value("warn_offender_id")
-        offender_name = drop.moderation.get_warns(guild_id, offender_id)
+        offender_name = moderation.get_warns(guild_id, offender_id)
         if offender_name and not get_value("warn_offender_name"):
             offender_name = offender_name.get("offender_name")
             set_value("warn_offender_name", offender_name)
@@ -136,7 +137,7 @@ class Warns:
             show_item("warn_fill_all_the_fucking_fields")
             return
         hide_item("warn_fill_all_the_fucking_fields")
-        drop.moderation.warn(guild_id, offender_id, offender_name, author_id, author_name, channel_id, reason)
+        moderation.warn(guild_id, offender_id, offender_name, author_id, author_name, channel_id, reason)
 
     @staticmethod
     def show_warns():
@@ -153,7 +154,7 @@ class Warns:
             show_item("warn_invalid_guild")
             proceed = False
         if proceed:
-            warns = drop.moderation.get_warns(guild_id, offender_id)
+            warns = moderation.get_warns(guild_id, offender_id)
             if not warns:
                 show_item("warn_no_warns")
                 return
@@ -180,7 +181,7 @@ class Warns:
 
     @staticmethod
     def delete_warn(sender, data):
-        drop.moderation.remove_warn(data[0], data[1], int(data[2]))
+        moderation.remove_warn(data[0], data[1], int(data[2]))
         show_item(f"{data[1]}_deleted_warn##{data[2]}")
 
 
@@ -191,9 +192,9 @@ class GuiStuff:
             delete_item('About window')
         with window('About window', no_title_bar=False, autosize=True, no_resize=True, no_close=False, no_move=False,
                     on_close=lambda: delete_item("About window")):
-            add_text(f"Drop version {drop.__version__}")
+            add_text(f"Drop version {__version__}")
             with collapsing_header("Drop licenses", default_open=True):
-                add_text(drop.licenses())
+                add_text(licenses())
 
     @staticmethod
     def theme_callback(sender, data):
@@ -203,6 +204,8 @@ class GuiStuff:
     @staticmethod
     def save_window_pos():
         print("Saving window positions")
+        if not os.path.exists('data/'):
+            os.mkdir('data/')
         config.read(config_filepath)
         for opened_window in get_windows():
             if ('##' in opened_window) or (opened_window == 'main') or ('dialog' in opened_window) \
@@ -227,12 +230,13 @@ class GuiStuff:
                     position_str = config.get('position', opened_window)
                 except configparser.NoOptionError:
                     # that window has not been saved yet.
-                    x_pos = randint(window_margins, int(window_height - window_margins))
-                    y_pos = randint(window_margins, int(window_width - window_margins))
+                    x_pos = randint(window_margins, int(window_width - window_margins))
+                    y_pos = randint(window_margins, int(window_height - window_margins))
                 else:
                     saved_position = position_str.split('x')
                     x_pos = int(saved_position[0])
                     y_pos = int(saved_position[1])
+                print(opened_window, x_pos, y_pos)
                 set_window_pos(opened_window, x_pos, y_pos)
 
 
@@ -302,7 +306,7 @@ def start_gui():
 
     with window('stored_guilds', label='Stored guilds', no_title_bar=False, autosize=True, no_resize=False,
                 no_close=True, no_move=False):
-        for guild in drop.finder.find_guilds():
+        for guild in finder.find_guilds():
             add_text(guild)
             add_button(f"{guild}_show_warns", callback=Guilds.get_warned_users, callback_data=f'{guild}',
                        label="Show all warns")

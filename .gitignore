@@ -3,5 +3,6 @@
 
 drop_mod.egg-info/
 build/
+build-old/
 dist/
 # build directories

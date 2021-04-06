@@ -1,6 +1,7 @@
 #!/bin/bash
 
 install=true
+reinstall=false
 
 if ! command -v python3 &> /dev/null; then
     echo "python3 could not be found"
@@ -21,6 +22,7 @@ fi
 if [ "$1" == 'force_install' ]; then
   echo "force_install passed, forcing install"
   install=true
+  reinstall=true
 elif [ "$1" == 'no_install' ]; then
   echo "no_install passed, disabling install"
   install=false
@@ -49,5 +51,9 @@ if $install; then
   printf "\n\n"
   echo "installing drop using pip"
   echo "---------------------------"
-  python3 -m pip install dist/drop_mod-*.whl --force-reinstall
+  if $reinstall; then
+    python3 -m pip install dist/drop_mod-*.whl --force-reinstall
+  else
+    python3 -m pip install dist/drop_mod-*.whl --force-reinstall
+  fi
 fi

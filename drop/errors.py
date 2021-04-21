@@ -36,3 +36,7 @@ class NoMutesForUser(Exception):
 
 class NoTempBansForGuild(Exception):
     """The guild does not have any temp bans."""
+
+
+class GameNotFound(Exception):
+    """Couldn't find any matching game on Steam/ProtonDB"""

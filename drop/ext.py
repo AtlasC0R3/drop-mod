@@ -70,6 +70,8 @@ to_replace = {
     '</li>': '\n'
 }
 
+protondb_colors = {"Platinum": 0xB7C9DE, "Gold": 0xCFB526, "Silver": 0xC1C1C1, "Bronze": 0xCB7F22, "Borked": 0xF90000}
+
 
 def format_html(str_input: str):
     for old, new in to_replace.items():

@@ -46,4 +46,4 @@ def get_protondb_summary(app_id: int):
 
 
 def get_steam_app_info(app_id: int):
-    return requests.get(f"https://store.steampowered.com/api/appdetails?appids={app_id}")
+    return requests.get(f"https://store.steampowered.com/api/appdetails?appids={app_id}").json()

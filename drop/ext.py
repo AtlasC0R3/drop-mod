@@ -78,3 +78,19 @@ def format_html(str_input: str):
         str_input = str_input.replace(old, new)
     p = re.compile(r'<.*?>')
     return p.sub('', str_input)
+
+
+def format_names(name_list: list):
+    name_count = len(name_list) - 1
+    names = ""
+    for idx, name in enumerate(name_list):
+        if idx == 0:
+            # First name
+            names = name
+        elif idx == name_count:
+            # Last name
+            names = names + " and " + name
+        else:
+            # A name.
+            names = names + ", " + name
+    return names

@@ -32,6 +32,12 @@ def licenses():
             "license": "MIT License",
             "link": "https://github.com/hoffstadt/DearPyGui/blob/master/LICENSE",
             "changes": None
+        },
+        {
+            "name": "Python Requests",
+            "license": "Apache 2.0",
+            "link": "https://github.com/psf/requests/blob/master/LICENSE",
+            "changes": "no changes made"
         }
     ]
     # If you installed these from PyPI directly (or just ran setup.py or pip to install this), then no changes have been

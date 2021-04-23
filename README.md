@@ -48,3 +48,5 @@ owofy("The quick brown fox jumps over the lazy dog.")
 [LyricsGenius](https://github.com/johnwmillr/LyricsGenius/), licensed under [MIT License](https://github.com/johnwmillr/LyricsGenius/blob/master/LICENSE.txt)
 
 [Parsedatetime](https://github.com/bear/parsedatetime/), licensed under [Apache 2.0](https://github.com/bear/parsedatetime/blob/master/LICENSE.txt)
+
+[requests](https://github.com/psf/requests), licensed under [Apache 2.0](https://github.com/psf/requests/blob/master/LICENSE)

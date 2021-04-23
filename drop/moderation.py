@@ -2,6 +2,8 @@ import os
 import json
 from datetime import datetime
 from drop.errors import *
+from drop.mute import add_mutes, get_mute_status, unmute_user
+from drop.tempban import add_bans, get_ban_status, unban_user
 
 
 def warn(guild_id: int, user_id: int, user_name: str, author_id: int, author_name: str, channel_id: int, reason: str):
@@ -153,3 +155,27 @@ def pop_rule(guild_id: int, index: str):
             os.remove(filepath)
         else:
             json.dump(rules, open(filepath, 'w+'))
+
+
+def migrate_user(guild_id: int, user_id: int, new_user_id: int):
+    user_warns = get_warns(guild_id, user_id)
+    for warning in user_warns.get('warns'):
+        warn(guild_id, new_user_id, user_warns.get('offender_name'), warning.get('warner'), warning.get('warner_name'),
+             warning.get('channel'), warning.get('reason'))
+    try:
+        mute = get_mute_status(guild_id, user_id)
+    except NoMutesForUser or NoMutesForGuild:
+        pass
+    else:
+        add_mutes(guild_id, mute['mute_role_id'], new_user_id, mute['mute_author_id'], mute['unmute_time'])
+        unmute_user(guild_id, user_id)
+
+    try:
+        tempban = get_ban_status(guild_id, user_id)
+    except NoTempBansForGuild:
+        pass
+    else:
+        if tempban:
+            add_bans(guild_id, new_user_id, tempban['ban_author_id'], tempban['unban_time'])
+            unban_user(guild_id, user_id)
+    return

@@ -40,3 +40,11 @@ class NoTempBansForGuild(Exception):
 
 class GameNotFound(Exception):
     """Couldn't find any matching game on Steam/ProtonDB"""
+
+
+class ConfigParameterNotFound(Exception):
+    """The config doesn't have that parameter."""
+
+
+class ConfigNotFound(Exception):
+    """No config found."""

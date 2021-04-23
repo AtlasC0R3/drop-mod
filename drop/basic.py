@@ -2,6 +2,7 @@ import random
 
 import duckduckpy
 import lyricsgenius
+from requests.exceptions import *
 
 import drop.ext as ext
 
@@ -105,7 +106,7 @@ def get_lyrics(artist, title):
             # has lyrics, and that they lead to youtu.be/DkrzV5GIQXQ! how the actual fuck did i get here
             # I am now in shock and terrified. If anyone's into ARGs and reading this, well here you go.
             # It appears to be in Japanese though. Anyway, enough 3 minutes wasted.
-        except requests.exceptions.HTTPError:
+        except HTTPError:
             song = None
             print("FIXME: Genius API token probably not working")
         if song:
@@ -119,7 +120,7 @@ def get_artist(artist):
     if genius:
         try:
             songs = genius.search_artist(artist, max_songs=5, sort='popularity').songs
-        except requests.exceptions.HTTPError:
+        except HTTPError:
             songs = None
             print("FIXME: Genius API token probably not working")
         if songs:

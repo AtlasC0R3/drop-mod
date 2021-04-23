@@ -54,6 +54,6 @@ if $install; then
   if $reinstall; then
     python3 -m pip install dist/drop_mod-*.whl --force-reinstall
   else
-    python3 -m pip install dist/drop_mod-*.whl --force-reinstall
+    python3 -m pip install dist/drop_mod-*.whl
   fi
 fi

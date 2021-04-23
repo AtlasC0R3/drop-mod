@@ -123,6 +123,8 @@ def get_artist(artist):
         except HTTPError:
             songs = None
             print("FIXME: Genius API token probably not working")
+        except AttributeError:
+            songs = None
         if songs:
             lyrics = []
             for song in songs:

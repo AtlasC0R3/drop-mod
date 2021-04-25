@@ -121,3 +121,16 @@ def add_guild_todo(guild_id: int, description: str, author_id: int):
             todo_file:
         json.dump(todo_data, todo_file)
         todo_file.close()
+
+
+def edit_guild_todo(guild_id: int, index: int, description: str):
+    todo_data = get_guild_todos(guild_id)
+    new_todo = {
+        'desc': description,
+        'time': datetime.now().strftime('%d/%m/%Y %H:%M:%S'),
+        'author': todo_data[index]['author']
+    }
+    todo_data[index] = new_todo
+    with open(f"data/servers/{guild_id}/todo.json", 'w+', newline="\n", encoding='utf-8') as todo_file:
+        json.dump(todo_data, todo_file)
+    return

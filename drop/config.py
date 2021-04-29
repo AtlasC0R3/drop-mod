@@ -88,7 +88,7 @@ def touch_server_config(guild_id):
         os.mkdir('data/servers/')
     if not os.path.exists(f'data/servers/{guild_id}/'):
         os.mkdir(f'data/servers/{guild_id}/')
-    json.dump({}, open(f'data/servers/{guild_id}/', 'w+'))
+    json.dump({}, open(f'data/servers/{guild_id}/config.json', 'w+'))
     return
 
 

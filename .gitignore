@@ -1,5 +1,6 @@
 .venv/
 .idea/
+.eggs/
 
 drop_mod.egg-info/
 build/

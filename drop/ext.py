@@ -56,7 +56,6 @@ class OwofyData:
                      'oU': 'U',
                      'OU': 'U',
                      'Ou': 'u'}  # removed stuff because... well, some didn't even work right.
-    # holy shit phos, thanks. really. i still had to do all of the caps and stuff but wow.
     owofy_exclamations = [' OwO', ' @w@', ' #w#', ' UwU', ' ewe', ' -w-', ' \'w\'', ' ^w^', ' >w<', ' ~w~', ' ¬w¬',
                           ' o((>ω< ))o', ' (p≧w≦q)', ' ( •̀ ω •́ )y', ' ✪ ω ✪', ' (。・ω・。)', ' (^・ω・^ )']
     # Why'd I put so many here?

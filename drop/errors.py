@@ -1,5 +1,4 @@
-class DumbError(Exception):
-    """testing error"""
+"""Error classes used by drop-mod"""
 
 
 class NoWarnError(Exception):

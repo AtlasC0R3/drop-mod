@@ -1,12 +1,19 @@
+"""Functions useful for temporary mutes, for any chat bot."""
+
 from datetime import datetime
 import json
-from drop.errors import *
+from drop.errors import NoMutesForGuild, NoMutesForUser
+from drop.ext import parse_times
 
 import parsedatetime
 cal = parsedatetime.Calendar()
 
 
 def check_mutes(get_role=True, clear_mutes=True):
+    """
+    Returns any mutes that should end by now.
+    Ideally run this command every minute or so, for maximum efficiency.
+    """
     unmute_list = []
     to_clear = []
     dt_string = datetime.now().strftime("%Y-%m-%d %H:%M")
@@ -15,13 +22,13 @@ def check_mutes(get_role=True, clear_mutes=True):
     if dt_string in unmutes:
         # we have stuff to do
         # DON'T TAKE THE WORDS "TO DO" WITH THE SAME DEFINITION AS BONK
-        for toUnmute in unmutes.get(dt_string):
-            guild_id = toUnmute[2]
+        for to_unmute in unmutes.get(dt_string):
+            guild_id = to_unmute[2]
             if get_role:
-                role_id = toUnmute[1]
+                role_id = to_unmute[1]
             else:
                 role_id = None
-            user_id = toUnmute[0]
+            user_id = to_unmute[0]
             unmute_list.append({
                 "guild_id": guild_id,
                 "role_id": role_id,
@@ -43,22 +50,14 @@ def check_mutes(get_role=True, clear_mutes=True):
 
 
 def add_mutes(guild_id: int, role_id: int, user_id: int, author_id: int, datetime_to_parse: str):
+    """
+    Add a temporary mute to a user.
+    NOTE: datetime_to_parse should be a string like: "1 hour 30 minutes"
+    """
     with open("data/unmutes.json", "r+", newline='\n', encoding='utf-8') as temp_file:
         mutes = json.load(temp_file)
     new_mute_data = (user_id, role_id, guild_id)
-    dt_obj = cal.parseDT(datetimeString=datetime_to_parse)
-    now_dt = datetime.now()
-    list_dt_obj = str(dt_obj[0]).split(":")
-    list_now_dt = str(now_dt).split(":")
-
-    str_now_dt = f'{list_now_dt[0]}:{list_now_dt[1]}'
-    str_dt_obj = f'{list_dt_obj[0]}:{list_dt_obj[1]}'
-    if dt_obj[1] == 0:
-        raise InvalidTimeParsed(f"Time string {datetime_to_parse} could not be parsed")
-    elif dt_obj[0] <= now_dt:
-        raise PastTimeError(f"Time {str(dt_obj)} is in the past: there's no logical way to unmute them that way")
-    elif dt_obj[0] == now_dt or str_dt_obj == str_now_dt:
-        raise PresentTimeError(f"Time {str(dt_obj)} is the same as now ({str(now_dt)})")
+    str_dt_obj = parse_times(datetime_to_parse)
     # if the script made it this far, this is real we have to store mute data
     if str_dt_obj not in mutes:
         mutes[str_dt_obj] = []
@@ -77,6 +76,9 @@ def add_mutes(guild_id: int, role_id: int, user_id: int, author_id: int, datetim
 
 
 def get_mute_status(guild_id: int, user_id: int):
+    """
+    Return data of the user's mute.
+    """
     with open("data/unmutes.json", "r", newline='\n', encoding='utf-8') as temp_file:
         mutes = json.load(temp_file)
     guild_mutes = mutes.get(str(guild_id))
@@ -99,11 +101,17 @@ def get_mute_status(guild_id: int, user_id: int):
 
 
 def get_mutes():
+    """
+    Gets all mutes.
+    """
     with open("data/unmutes.json", "r", newline='\n', encoding='utf-8') as temp_file:
         return json.load(temp_file)
 
 
 def unmute_user(guild_id: int, user_id: int):
+    """
+    Remove the mute status from a user.
+    """
     mutes = get_mutes()
     guild_mutes = mutes.get(str(guild_id))
     user_mute = get_mute_status(guild_id, user_id)
@@ -117,7 +125,7 @@ def unmute_user(guild_id: int, user_id: int):
     if not guild_mutes:
         mutes.pop(str(guild_id))
     else:
-        for key, value in mutes[str(guild_id)].items():
+        for value in mutes[str(guild_id)].items():
             value[2] = value[2] - 1
     json.dump(mutes, open("data/unmutes.json", "w+", newline='\n', encoding='utf-8'))
     return mute_role_id

@@ -1,14 +1,19 @@
+"""Functions for both user-specific and guild-specific to-dos."""
+
 import os
 import json
 from datetime import datetime
 
-dir_path = "data/todo/"
+DIR_PATH = "data/todo/"
 
 
 def init_todo(user_id: int, force_init=False):
-    file_path = dir_path + f"{user_id}.json"
-    if not os.path.exists(dir_path):
-        os.makedirs(dir_path)
+    """
+    Loads user-specific to-dos using the given filepath.
+    """
+    file_path = DIR_PATH + f"{user_id}.json"
+    if not os.path.exists(DIR_PATH):
+        os.makedirs(DIR_PATH)
     if (not os.path.exists(file_path)) or force_init:
         with open(file_path, 'w+', newline="\n", encoding='utf-8') as todo_file:
             todo_data = []
@@ -16,7 +21,8 @@ def init_todo(user_id: int, force_init=False):
 
 
 def get_todos(user_id: int):
-    file_path = dir_path + f"{user_id}.json"
+    """Get the specified user's to-dos."""
+    file_path = DIR_PATH + f"{user_id}.json"
     try:
         with open(file_path, newline="\n", encoding='utf-8') as todo_file:
             todo_data = json.load(todo_file)
@@ -34,10 +40,12 @@ def get_todos(user_id: int):
 
 
 def get_todo(user_id: int, index: int):
+    """Get a specific to-do item from a user's to-do list."""
     return get_todos(user_id).get(index)
 
 
 def edit_todo(user_id: int, index: int, description: str):
+    """Edit a user's to-do item."""
     todo_data = get_todos(user_id)
     new_todo = {
         'desc': description,
@@ -46,10 +54,10 @@ def edit_todo(user_id: int, index: int, description: str):
     todo_data[index] = new_todo
     with open(f"data/todo/{user_id}.json", 'w+', newline="\n", encoding='utf-8') as todo_file:
         json.dump(todo_data, todo_file)
-    return
 
 
 def add_todo(user_id: int, description: str):
+    """Append a to-do item to a user's to-do list."""
     todo_data = get_todos(user_id)
     new_todo = {
         'desc': description,
@@ -62,11 +70,13 @@ def add_todo(user_id: int, description: str):
 
 
 def rm_todo(user_id: int, index: int):
+    """Remove a to-do item from a user's to-do list."""
     todo_data = get_todos(user_id)
     try:
         todo_data.pop(index)
-    except IndexError:
-        raise IndexError(f"Index {index} does not exist in to-do data for user {user_id}")
+    except IndexError as exception:
+        raise IndexError(f"Index {index} does not exist in to-do data for user {user_id}") \
+            from exception
     with open(f"data/todo/{user_id}.json", 'w+', newline="\n", encoding='utf-8') as todo_file:
         json.dump(todo_data, todo_file)
         todo_file.close()
@@ -76,8 +86,10 @@ def rm_todo(user_id: int, index: int):
 
 
 def get_guild_todos(guild_id: int):
+    """Gets every to-dos from a guild."""
     try:
-        with open(f"data/servers/{guild_id}/todo.json", newline="\n", encoding='utf-8') as todo_file:
+        with open(f"data/servers/{guild_id}/todo.json", newline="\n", encoding='utf-8') as \
+                todo_file:
             return json.load(todo_file)
     except FileNotFoundError:
         init_guild_todos(guild_id)
@@ -87,6 +99,12 @@ def get_guild_todos(guild_id: int):
 
 
 def init_guild_todos(guild_id: int, force_init=False):
+    """
+    Initialize a to-do list for a guild.
+
+    NOTE: force_init will RESET the past to-do list, if it exists!
+    Only set it to True if you know what you're doing.
+    """
     if not os.path.exists(f"data/servers/{guild_id}/"):
         os.makedirs(f"data/servers/{guild_id}/")
     if (not os.path.exists(f"data/servers/{guild_id}/todo.json")) or force_init:
@@ -94,11 +112,13 @@ def init_guild_todos(guild_id: int, force_init=False):
 
 
 def rm_guild_todo(guild_id: int, index: int):
+    """Remove a to-do item from a guild's to-do list."""
     todo_data = get_guild_todos(guild_id)
     try:
         todo_data.pop(index)
-    except IndexError:
-        raise IndexError(f"Index {index} does not exist in to-do data for guild {guild_id}")
+    except IndexError as exception:
+        raise IndexError(f"Index {index} does not exist in to-do data for guild {guild_id}") \
+            from exception
     if len(todo_data) == 0:
         os.remove(f"data/servers/{guild_id}/todo.json")
     else:
@@ -106,10 +126,10 @@ def rm_guild_todo(guild_id: int, index: int):
                 as todo_file:
             json.dump(todo_data, todo_file)
             todo_file.close()
-    return
 
 
 def add_guild_todo(guild_id: int, description: str, author_id: int):
+    """Add a to-do item to a guild's to-do list."""
     todo_data = get_guild_todos(guild_id)
     new_todo = {
         'desc': description,
@@ -124,6 +144,7 @@ def add_guild_todo(guild_id: int, description: str, author_id: int):
 
 
 def edit_guild_todo(guild_id: int, index: int, description: str):
+    """Edit a to-do item from a guild's to-do list."""
     todo_data = get_guild_todos(guild_id)
     new_todo = {
         'desc': description,
@@ -131,6 +152,6 @@ def edit_guild_todo(guild_id: int, index: int, description: str):
         'author': todo_data[index]['author']
     }
     todo_data[index] = new_todo
-    with open(f"data/servers/{guild_id}/todo.json", 'w+', newline="\n", encoding='utf-8') as todo_file:
+    with open(f"data/servers/{guild_id}/todo.json", 'w+', newline="\n", encoding='utf-8') as \
+            todo_file:
         json.dump(todo_data, todo_file)
-    return

@@ -1,16 +1,18 @@
+"""Functions useful for temporary bans, for any chat bot."""
+
+
 from datetime import datetime
 import json
 import os
-from drop.errors import *
+from drop.errors import NoTempBansForGuild
+from drop.ext import parse_times
 
-import parsedatetime
-cal = parsedatetime.Calendar()
-
-# If this whole extension looks familiar, it is: I basically just copy-pasted mute.py and edited it to fit with
-# temp-bans instead of mutes.
+# If this whole extension looks familiar, it is: I basically just copy-pasted mute.py
+# and edited it to fit with temp-bans instead of mutes.
 
 
 def get_temp_bans_file():
+    """Returns any temp bans."""
     try:
         with open("data/temp_bans.json", "r", encoding="utf-8", newline="\n") as file:
             return json.load(file)
@@ -23,15 +25,19 @@ def get_temp_bans_file():
 
 
 def check_bans(clear_bans=True):
+    """
+        Returns any temp bans that should end by now.
+        Ideally run this command every minute or so, for maximum efficiency.
+        """
     unban_list = []
     to_clear = []
     dt_string = datetime.now().strftime("%Y-%m-%d %H:%M")
     unbans = get_temp_bans_file()
     if dt_string in unbans:
         # we have people to unban for now
-        for toUnban in unbans.get(dt_string):
-            guild_id = toUnban[1]
-            user_id = toUnban[0]
+        for to_unban in unbans.get(dt_string):
+            guild_id = to_unban[1]
+            user_id = to_unban[0]
             unban_list.append({
                 "guild_id": guild_id,
                 "user_id": user_id
@@ -52,21 +58,14 @@ def check_bans(clear_bans=True):
 
 
 def add_bans(guild_id: int, user_id: int, author_id: int, datetime_to_parse: str):
+    """
+    Add a temporary ban to a user.
+    NOTE: datetime_to_parse should be a string like: "1 hour 30 minutes"
+    """
     bans = get_temp_bans_file()
     new_ban_data = (user_id, guild_id)
-    dt_obj = cal.parseDT(datetimeString=datetime_to_parse)
-    now_dt = datetime.now()
-    list_dt_obj = str(dt_obj[0]).split(":")
-    list_now_dt = str(now_dt).split(":")
+    str_dt_obj = parse_times(datetime_to_parse)
 
-    str_now_dt = f'{list_now_dt[0]}:{list_now_dt[1]}'
-    str_dt_obj = f'{list_dt_obj[0]}:{list_dt_obj[1]}'
-    if dt_obj[1] == 0:
-        raise InvalidTimeParsed(f"Time string {datetime_to_parse} could not be parsed")
-    elif dt_obj[0] <= now_dt:
-        raise PastTimeError(f"Time {str(dt_obj)} is in the past: there's no logical way to unban them that way")
-    elif dt_obj[0] == now_dt or str_dt_obj == str_now_dt:
-        raise PresentTimeError(f"Time {str(dt_obj)} is the same as now ({str(now_dt)})")
     # if the script made it this far, this is real we have to store temp-ban data
     if str_dt_obj not in bans:
         bans[str_dt_obj] = []
@@ -85,6 +84,9 @@ def add_bans(guild_id: int, user_id: int, author_id: int, datetime_to_parse: str
 
 
 def get_ban_status(guild_id: int, user_id: int):
+    """
+    Return data of the user's temp ban.
+    """
     with open("data/temp_bans.json", "r", newline='\n', encoding='utf-8') as temp_file:
         bans = json.load(temp_file)
     guild_temp_bans = bans.get(str(guild_id))
@@ -105,11 +107,15 @@ def get_ban_status(guild_id: int, user_id: int):
 
 
 def unban_user(guild_id: int, user_id: int):
+    """
+    Removes the temporary ban from a user.
+    """
     bans = get_temp_bans_file()
     try:
         guild_bans = bans.get(str(guild_id))
-    except KeyError:
-        raise NoTempBansForGuild(f"Guild {guild_id} does not have any current temp-bans.")
+    except KeyError as exception:
+        raise NoTempBansForGuild(f"Guild {guild_id} does not have any current temp-bans.") from \
+            exception
     user_bans = get_ban_status(guild_id, user_id)
     unban_time = user_bans["unban_time"]
     ban_index = user_bans["ban_index"]
@@ -120,7 +126,6 @@ def unban_user(guild_id: int, user_id: int):
     if not guild_bans:
         bans.pop(str(guild_id))
     else:
-        for key, value in bans[str(guild_id)].items():
+        for value in bans[str(guild_id)].items():
             value[2] = value[2] - 1
     json.dump(bans, open("data/temp_bans.json", "w+", newline='\n', encoding='utf-8'))
-    return

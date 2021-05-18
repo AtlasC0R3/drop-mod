@@ -1,7 +1,14 @@
+"""
+A Python moderation toolkit built for chat bots
+"""
+
 __version__ = "1.5.1"
 
 
 def licenses():
+    """
+    Returns all of the licenses for drop-mod's dependencies.
+    """
     license_list = [
         {
             "name": "Drop",
@@ -40,8 +47,8 @@ def licenses():
             "changes": "no changes made"
         }
     ]
-    # If you installed these from PyPI directly (or just ran setup.py or pip to install this), then no changes have been
-    # made, so you don't need to stress out about that.
+    # If you installed these from PyPI directly (or just ran setup.py or pip to install this), then
+    # no changes have been made, so you don't need to stress out about that.
     license_str = ""
     for dep in license_list:
         to_add = f"{dep['name']}, licensed under {dep['license']}"

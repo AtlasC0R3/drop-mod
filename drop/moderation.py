@@ -3,10 +3,10 @@
 import os
 import json
 from datetime import datetime
-from drop.errors import NoWarnError, NoRulesError, BrokenRulesError, NoMutesForUser, \
+from .errors import NoWarnError, NoRulesError, BrokenRulesError, NoMutesForUser, \
     NoMutesForGuild, NoTempBansForGuild
-from drop.mute import add_mutes, get_mute_status, unmute_user
-from drop.tempban import add_bans, get_ban_status, unban_user
+from .mute import add_mutes, get_mute_status, unmute_user
+from .tempban import add_bans, get_ban_status, unban_user
 
 
 def warn(guild_id: int, user_id: int, user_name: str, author_id: int, author_name: str,

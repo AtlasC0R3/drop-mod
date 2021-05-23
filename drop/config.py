@@ -5,7 +5,7 @@ Functions for guild/bot config files and whatnot.
 import json
 import os
 
-from drop.errors import ConfigParameterNotFound, ConfigNotFound
+from .errors import ConfigParameterNotFound, ConfigNotFound
 
 BOT_CONFIG = {}
 

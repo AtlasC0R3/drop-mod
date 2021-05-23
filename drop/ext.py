@@ -3,7 +3,7 @@
 import re
 from datetime import datetime
 
-from drop.errors import InvalidTimeParsed, PastTimeError, PresentTimeError
+from .errors import InvalidTimeParsed, PastTimeError, PresentTimeError
 import parsedatetime
 cal = parsedatetime.Calendar()
 

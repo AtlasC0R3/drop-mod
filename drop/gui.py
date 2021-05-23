@@ -14,8 +14,8 @@ from dearpygui.simple import show_item, window, hide_item, collapsing_header, ge
     show_about, show_debug, show_logger, show_metrics, show_documentation, set_window_pos, \
     menu, menu_bar
 
-from drop import licenses
-from drop import moderation, errors, finder, __version__
+from . import licenses
+from . import moderation, errors, finder, __version__
 
 print(f"Running in {os.getcwd()}")
 if not os.path.exists('data/'):

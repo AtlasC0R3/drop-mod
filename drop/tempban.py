@@ -4,8 +4,8 @@
 from datetime import datetime
 import json
 import os
-from drop.errors import NoTempBansForGuild
-from drop.ext import parse_times
+from .errors import NoTempBansForGuild
+from .ext import parse_times
 
 # If this whole extension looks familiar, it is: I basically just copy-pasted mute.py
 # and edited it to fit with temp-bans instead of mutes.

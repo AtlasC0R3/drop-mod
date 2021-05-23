@@ -8,7 +8,7 @@ import duckduckpy
 import lyricsgenius
 from requests.exceptions import HTTPError
 
-import drop.ext as ext
+from . import ext
 
 GENIUS = None
 

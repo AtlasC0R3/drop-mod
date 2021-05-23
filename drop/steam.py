@@ -3,8 +3,8 @@
 import re
 import requests
 
-import drop.ext as ext
-from drop.errors import GameNotFound
+from . import ext
+from .errors import GameNotFound
 
 # steam_api_token = None
 

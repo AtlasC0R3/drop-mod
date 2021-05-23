@@ -2,8 +2,8 @@
 
 from datetime import datetime
 import json
-from drop.errors import NoMutesForGuild, NoMutesForUser
-from drop.ext import parse_times
+from .errors import NoMutesForGuild, NoMutesForUser
+from .ext import parse_times
 
 import parsedatetime
 cal = parsedatetime.Calendar()

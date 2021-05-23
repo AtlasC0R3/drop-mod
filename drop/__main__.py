@@ -18,9 +18,9 @@ if (os.getenv("DISPLAY") is None) and (os.name == 'posix'):
 # if type(RUN_GUI) is not str:
 # What the actual fuck was I thinking when writing this?
 if RUN_GUI:
-    import drop.gui
+    from . import gui
     try:
-        drop.gui.start_gui()
+        gui.start_gui()
     except ImportError:
         sys_exit("Dear PyGui not installed: cannot run the GUI without the core GUI library.")
 else:

@@ -4,11 +4,11 @@ but still are great commands that every bot should have.
 """
 import random
 
-import duckduckpy
 import lyricsgenius
 from requests.exceptions import HTTPError
 
 from . import ext
+from .types import Search
 
 GENIUS = None
 
@@ -29,61 +29,15 @@ def search(to_search: str):
     Does a DuckDuckPy query. NOTE: does not return search results, only returns queries.
     I don't know how I can really explain this.
     """
-    response = duckduckpy.query(to_search, user_agent=u'duckduckpy 0.2', no_redirect=False,
-                                no_html=True, skip_disambig=True, container='dict')
-    if response['abstract']:
-        infobox = []
-        is_infobox = False
-        image = None
-        if response.get('infobox'):
-            infobox = response['infobox']['content']
-            is_infobox = True
-        if response['image']:
-            response_image = response['image']
-            image = f'https://duckduckgo.com{response_image}' \
-                if response_image.startswith('/') else response_image
-        result = {
-            "title": response['heading'],
-            "description": ext.format_html(response.get('abstract_text')),
-            "url": response['abstract_url'],
-            "source": response['abstract_source'],
-            "image": image,
-            "fields": [{
-                'name': x['label'],
-                'value': ''.join(list(x['value'])[:253]) + '...' if len(x) >= 256 else x['value']
-            } for x in infobox],
-            "infobox": is_infobox
-        }
-    elif response.get('abstract_text'):
-        result = {
-            "title": response['heading'],
-            "description": response.get('abstract_text'),
-            "url": response.get('abstract_url'),
-            "source": response['abstract_source'],
-            "fields": [],
-            "image": None,
-            "infobox": False
-        }
-        for topic in response['related_topics'][:5]:
-            if topic.get('topics'):
-                pass  # not really what we're looking for
-            else:
-                name = topic.get('text')
-                if len(name) >= 256:
-                    name = ''.join(list(name)[:253]) + '...'
-                if ' - ' in name:
-                    things = name.split(' - ')
-                    name = things[0]
-                    description = ' - '.join(things[1:]) + '\n' + f"({topic.get('first_url')})"
-                else:
-                    description = topic.get('first_url')
-                result["fields"].append({
-                    "name": name,
-                    "value": description
-                })
-    else:
-        result = None
-    return result
+    engines = (lambda: ext.duckducksearch(to_search), lambda: ext.qwant_search(to_search))
+    result = None
+    for engine in engines:
+        result = engine()
+        if result:
+            break
+    if not result:
+        return None
+    return Search().from_dict(result) if isinstance(result, dict) else result
 
 
 def init_genius(token):

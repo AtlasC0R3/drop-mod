@@ -4,7 +4,12 @@ import re
 from datetime import datetime
 
 from .errors import InvalidTimeParsed, PastTimeError, PresentTimeError
+from . import __version__ as version
+from .types import Search, _SearchField
+
 import parsedatetime
+import duckduckpy
+import requests
 cal = parsedatetime.Calendar()
 
 owofy_letters = {'r': 'w',
@@ -128,3 +133,57 @@ def parse_times(datetime_to_parse: str):
     if dt_obj[0] == now_dt or str_dt_obj == str_now_dt:
         raise PresentTimeError(f"Time {str(dt_obj)} is the same as now ({str(now_dt)})")
     return str_dt_obj
+
+
+def duckducksearch(to_search: str):
+    response = duckduckpy.query(to_search, user_agent=u'duckduckpy 0.2', no_redirect=False,
+                                no_html=True, skip_disambig=True)
+    if response.abstract:
+        infobox = []
+        is_infobox = False
+        image = None
+        if response.infobox:
+            infobox = response.infobox['content']
+            is_infobox = True
+        if response.image:
+            response_image = response.image
+            image = f'https://duckduckgo.com{response_image}' \
+                if response_image.startswith('/') else response_image
+        result = {
+            "title": response.heading,
+            "description": format_html(response.abstract_text),
+            "url": response.abstract_url,
+            "source": response.abstract_source,
+            "image": image,
+            "fields": [{
+                'name': x['label'],
+                'value': ''.join(list(x['value'])[:253]) + '...' if len(x) >= 256 else x['value']
+            } for x in infobox if x['data_type'] == 'string'],
+            "infobox": is_infobox,
+            "engine": "DuckDuckGo (via DuckDuckPy)",
+            "engine_icon": "https://duckduckgo.com/assets/icons/meta/DDG-icon_256x256.png"
+        }
+    else:
+        return None
+    return result
+
+
+def qwant_search(to_search: str):
+    response = requests.get(
+        f"https://api.qwant.com/api/search/web?count=10&offset=0&q={to_search}"
+        f"&t=web"
+        f"&uiv=1"
+        f"&safesearch=2"
+        f"&locale=en_US",
+        headers={'User-Agent': f'drop-mod {version}'}).json()
+    items = response['data']['result']['items']
+    if not items:
+        return None
+
+    result = Search()
+    result.engine = "Qwant"
+    result.engine_icon = "https://www.qwant.com/public/favicon-196" \
+                         ".72d42c0cdb4ff221db29fea589d2e8d4.png"
+    result.title = f"Search results for {response['data']['query']['query']}"  # this is logic
+    result.fields = [_SearchField().from_dict(x) for x in items]
+    return result

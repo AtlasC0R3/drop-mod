@@ -1,7 +1,7 @@
 """General functions for Steam-related stuff."""
 
 import re
-import requests
+import aiohttp
 
 from . import ext
 from .errors import GameNotFound
@@ -13,19 +13,23 @@ from .errors import GameNotFound
 #     steam_api_token = token
 
 
-def search_game(query: str):
+async def search_game(query: str):
     """Searches a game on Steam using a query string, and returns any app IDs found."""
-    return re.findall('appid="(.*?)"', requests.get(
-        f"https://store.steampowered.com/search/suggest?term={query}&f=games&cc=CA&l=english").text)
+    async with aiohttp.ClientSession() as session:
+        async with session.get(f"https://store.steampowered.com/search/suggest?term={query}"
+                               f"&f=games&cc=CA&l=english") as r:
+            return re.findall('appid="(.*?)"', await r.text())
 
 
-def get_protondb_summary(app_id: int):
+async def get_protondb_summary(app_id: int):
     """Gets ProtonDB's summary about any game, using a Steam AppID."""
-    request = requests.get(f"https://www.protondb.com/api/v1/reports/summaries/{app_id}.json")
-    if request.status_code == 404:
-        raise GameNotFound(f"Could not find any reports for app ID {app_id}")
-
-    received = request.json()
+    async with aiohttp.ClientSession() as session:
+        async with session.get(f"https://www.protondb.com/api/v1/reports/summaries/"
+                               f"{app_id}.json") as r:
+            if r.status == 404:
+                raise GameNotFound(f"Could not find any reports for app ID {app_id}")
+            else:
+                received = await r.json()
 
     tier = received.get("tier").title()
     confidence = received.get("confidence").title()
@@ -51,6 +55,9 @@ def get_protondb_summary(app_id: int):
     return received
 
 
-def get_steam_app_info(app_id: int):
+async def get_steam_app_info(app_id: int):
     """Simple HTTP request that returns the JSON data for a Steam AppID."""
-    return requests.get(f"https://store.steampowered.com/api/appdetails?appids={app_id}").json()
+    async with aiohttp.ClientSession() as session:
+        async with session.get(f"https://store.steampowered.com/api/appdetails?appids={app_id}") \
+                as r:
+            return await r.json()

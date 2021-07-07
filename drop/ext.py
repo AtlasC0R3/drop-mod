@@ -216,4 +216,4 @@ async def genius_get_lyrics(url: str):
                     return await genius_get_lyrics(url)
 
 
-genius_system_artists = ('Genius', 'Spotify')
+genius_system_artists = ('Genius', 'Spotify', 'Ego Trip Magazine')

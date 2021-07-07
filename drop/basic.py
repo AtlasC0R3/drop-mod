@@ -4,11 +4,9 @@ but still are great commands that every bot should have.
 """
 import random
 
-import lyricsgenius
-from requests.exceptions import HTTPError
-
 from . import ext
-from .types import Search
+from .types import Search, Lyrics
+import aiohttp
 
 GENIUS = None
 
@@ -45,52 +43,31 @@ def init_genius(token):
     Initializes Genius' lyrics command (such as get_lyrics() or get_artist()).
     """
     global GENIUS
-    GENIUS = lyricsgenius.Genius(token, verbose=False, remove_section_headers=True,
-                                 skip_non_songs=True, excluded_terms=["(Remix)", "(Live)"])
+    GENIUS = token
 
 
-# noinspection PyUnresolvedReferences
-def get_lyrics(artist, title):
+async def lyrics(query: str):
     """
-    Obtains lyrics for a song using lyricsgenius.
-    NOTE: requires init_genius() to have been used! or... how do i explain things.
+    Does a Genius search.
     """
-    if GENIUS:
-        try:
-            song = GENIUS.search_song(title=title, artist=artist)
-            # Fun fact: that's how I discovered that GHOST by Camellia
-            # (the song every beat saber player hates the most) has lyrics, and that they lead to
-            # youtu.be/DkrzV5GIQXQ! how the actual fuck did i get here
-            # I am now in shock and terrified. If anyone's into ARGs and reading this,
-            # well here you go. It appears to be in Japanese though.
-        except HTTPError:
-            song = None
-            print("FIXME: Genius API token probably not working")
-        if song:
-            return song
-    # no genius, woopsies
-    return None
+    async with aiohttp.ClientSession(headers={'Authorization': f'Bearer {GENIUS}'}) as session:
+        async with session.get(f"https://api.genius.com/search?q={query}") as r:
+            if r.status == 400:
+                print("Genius API token probably not working")
+            results = (await r.json())['response']['hits']
+            try:
+                song_result = results[0]['result']
+            except IndexError:
+                return None
+    song_path = f"https://genius.com{song_result['path']}"
 
+    song = Lyrics()
 
-# noinspection PyUnresolvedReferences
-def get_artist(artist):
-    """
-    Obtains an artist's most popular songs using lyricsgenius.
-    NOTE: requires init_genius() to have been used!
-    """
-    if GENIUS:
-        try:
-            songs = GENIUS.search_artist(artist, max_songs=5, sort='popularity').songs
-        except HTTPError:
-            songs = None
-            print("FIXME: Genius API token probably not working")
-        except AttributeError:
-            songs = None
-        if songs:
-            lyrics = []
-            for song in songs:
-                lyric = song.lyrics.split('\n')
-                lyrics.append([song.title, lyric[:5], song.url])
-            artist_name = songs[0].artist
-            return ['Genius', [artist_name, lyrics]]
-    return ['nothing', []]
+    song.lyrics = await ext.genius_get_lyrics(song_path)
+    song.title = song_result["title"]
+    song.artist = song_result["primary_artist"]["name"]
+    song.url = song_path
+    song.thumbnail = song_result["song_art_image_url"]
+    song.set_source('Genius', "http://images.genius.com/8ed669cadd956443e29c70361ec4f372"
+                              ".1000x1000x1.png")
+    return song

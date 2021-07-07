@@ -7,9 +7,10 @@ from .errors import InvalidTimeParsed, PastTimeError, PresentTimeError
 from . import __version__ as version
 from .types import Search, _SearchField
 
+from bs4 import BeautifulSoup
 import parsedatetime
-import duckduckpy
-import requests
+import aiohttp
+
 cal = parsedatetime.Calendar()
 
 owofy_letters = {'r': 'w',
@@ -187,3 +188,14 @@ def qwant_search(to_search: str):
     result.title = f"Search results for {response['data']['query']['query']}"  # this is logic
     result.fields = [_SearchField().from_dict(x) for x in items]
     return result
+
+
+async def genius_get_lyrics(url: str):
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as r:
+            if r.status == 200:
+                try:
+                    return BeautifulSoup(await r.text(), "html.parser") \
+                        .find("div", class_="lyrics").get_text()
+                except AttributeError:
+                    return await genius_get_lyrics(url)

@@ -17,35 +17,33 @@ def licenses():
             "changes": "no changes made"
         },
         {
-            "name": "duckduckpy",
-            "license": "MIT License",
-            "link": "https://github.com/ivankliuk/duckduckpy/blob/master/LICENSE",
-            "changes": None
-        },
-        {
-            "name": "LyricsGenius",
-            "license": "MIT License",
-            "link": "https://github.com/johnwmillr/LyricsGenius/blob/master/LICENSE.txt",
-            "changes": None
-        },
-        {
             "name": "Parsedatetime",
             "license": "Apache 2.0",
             "link": "https://github.com/bear/parsedatetime/blob/master/LICENSE.txt",
             "changes": "no changes made"
         },
         {
-            "name": "Dear PyGui",
-            "license": "MIT License",
-            "link": "https://github.com/hoffstadt/DearPyGui/blob/master/LICENSE",
-            "changes": None
+            "name": "aiohttp",
+            "license": "Apache 2.0",
+            "link": "https://github.com/aio-libs/aiohttp/blob/master/LICENSE.txt "
+                    "(http://www.apache.org/licenses/LICENSE-2.0)",
+            # The LICENSE.txt directs the user there anyways.
+            "changes": "no changes made"
         },
         {
-            "name": "Python Requests",
-            "license": "Apache 2.0",
-            "link": "https://github.com/psf/requests/blob/master/LICENSE",
+            "name": "BeautifulSoup",
+            "license": "MIT License",
+            "link": "https://mit-license.org/",
+            # AFAIK there's no official link to its own license. Correct me if I'm wrong.
+            # I'll gladly correct that error.
             "changes": "no changes made"
         }
+        # {
+        #     "name": "Dear PyGui",
+        #     "license": "MIT License",
+        #     "link": "https://github.com/hoffstadt/DearPyGui/blob/master/LICENSE",
+        #     "changes": None
+        # } isn't *really* in drop's core
     ]
     # If you installed these from PyPI directly (or just ran setup.py or pip to install this), then
     # no changes have been made, so you don't need to stress out about that.

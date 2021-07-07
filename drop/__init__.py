@@ -2,7 +2,7 @@
 A Python moderation toolkit built for chat bots
 """
 
-__version__ = "1.6.0"
+__version__ = "2.0.0"
 
 
 def licenses():

@@ -1,3 +1,42 @@
+class Moderator:
+    """Someone who moderates. Has an ID and name for the moderator."""
+    id = 0
+    name = ""
+
+
+class Warn:
+    """A warning, usually to a user"""
+    warner = Moderator()
+    reason = ""
+    channel = ""
+    datetime = ""
+
+    def from_dict(self, warn_dict: dict):
+        self.warner.id = warn_dict['warner']
+        self.warner.name = warn_dict['warner_name']
+        self.reason = warn_dict['reason']
+        self.channel = warn_dict['channel']
+        self.datetime = warn_dict['datetime']
+
+    def to_dict(self):
+        return {
+            "warner": self.warner.id,
+            "warner_name": self.warner.name,
+            "reason": self.reason,
+            "channel": self.channel,
+            "datetime": self.datetime
+        }
+
+    def __getitem__(self, item):
+        # so that people using drop-mod with dictionaries will still be able to use it
+        # hopefully without changing much. sort-of legacy support, I guess you can call it that?
+        return getattr(self, item) if hasattr(self, item) else self.to_dict().get(item)
+
+    def get(self, item):
+        # since some might still use dictionary.get()
+        return self.__getitem__(item)
+
+
 class _SearchField:
     """A search field. Can be from a Wikipedia result field to a search result."""
     name = ""

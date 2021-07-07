@@ -7,9 +7,10 @@ from .errors import NoWarnError, NoRulesError, BrokenRulesError, NoMutesForUser,
     NoMutesForGuild, NoTempBansForGuild
 from .mute import add_mutes, get_mute_status, unmute_user
 from .tempban import add_bans, get_ban_status, unban_user
+from .types import Warn
 
 
-def warn(guild_id: int, user_id: int, user_name: str, author_id: int, author_name: str,
+def warn(guild_id: int, user_id: int, author_id: int, author_name: str,
          channel_id: int, reason: str):
     """Warn a user inside a guild."""
     dt_string = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
@@ -26,7 +27,6 @@ def warn(guild_id: int, user_id: int, user_name: str, author_id: int, author_nam
         with open(f"data/servers/{guild_id}/warns/{user_id}.json", 'w+', newline="\n",
                   encoding='utf-8') as warn_file:
             warn_data = ({
-                'offender_name': user_name,
                 'warns': [
                     {
                         'warner': author_id,
@@ -53,8 +53,11 @@ def warn(guild_id: int, user_id: int, user_name: str, author_id: int, author_nam
                                   newline="\n", encoding='utf-8'))
 
 
-def get_warns(guild_id: int, user_id: int):
-    """Get a user's warns inside a guild."""
+def get_warn_file(guild_id: int, user_id: int):
+    """
+    Returns the JSON data of the user's warn file.
+    Or the legacy "get_warns()", now that I think about it.
+    """
     try:
         with open(f"data/servers/{guild_id}/warns/{user_id}.json", 'r', newline="\n",
                   encoding='utf-8') as warn_file:
@@ -63,6 +66,17 @@ def get_warns(guild_id: int, user_id: int):
     except FileNotFoundError:
         # User does not have any warns.
         return None
+
+
+def get_warns(guild_id: int, user_id: int):
+    """Returns a user's warns inside a guild."""
+    warns = get_warn_file(guild_id, user_id)
+    warns_list = []
+    for x in warns.get('warns'):
+        y = Warn()
+        y.from_dict(x)
+        warns_list.append(y)
+    return warns_list
 
 
 def write_warns(guild_id: int, user_id: int, new_warns: dict):
@@ -88,25 +102,27 @@ def get_warn(guild_id: int, user_id: int, warn_index: int):
         # User does not have any warns.
         return None
     warns = warn_data.get('warns')
+    warning = Warn()
+    warning.from_dict(warns[warn_index])
     try:
-        return warns[warn_index]
+        return warning
     except IndexError as exception:
         raise IndexError(f"Warn index {warn_index} is not in current user's warns") from exception
 
 
 def remove_warn(guild_id: int, user_id: int, warn_index: int):
     """Remove a user's warn using a specific index."""
-    warn_data = get_warns(guild_id, user_id)
+    warn_data = get_warn_file(guild_id, user_id)
     if warn_data is None:
         raise NoWarnError(f"User {user_id} does not have any warns: impossible to remove warns "
                           f"if they don't exist")
-    warns = warn_data.get('warns')
+    warns = warn_data['warns']
     # do the whole removing process.
     warns = [x for x in warns if x != warns[warn_index]]
     warn_data["warns"] = warns
     if len(warns) <= 0:
         # no warns, might as well remove the file
-        os.remove(f"data/servers/{guild_id}/warns/{user_id}.json")
+        clear_warns(guild_id, user_id)
     else:
         json.dump(warn_data, open(f"data/servers/{guild_id}/warns/{user_id}.json", 'w',
                                   newline="\n", encoding='utf-8'))
@@ -124,7 +140,7 @@ def clear_warns(guild_id: int, user_id: int):
 
 def edit_warn(guild_id: int, user_id: int, warn_index: int, new_reason: str):
     """Edit a user's warn by a specific index."""
-    warns = get_warns(guild_id, user_id)
+    warns = get_warn_file(guild_id, user_id)
     warn_element = warns.get('warns')[warn_index]
     warn_element['reason'] = new_reason
     write_warns(guild_id, user_id, warns)
@@ -185,8 +201,8 @@ def pop_rule(guild_id: int, index: str):
 def migrate_user(guild_id: int, user_id: int, new_user_id: int):
     """Migrate an entire user's data to another."""
     user_warns = get_warns(guild_id, user_id)
-    for warning in user_warns.get('warns'):
-        warn(guild_id, new_user_id, user_warns.get('offender_name'), warning.get('warner'),
+    for warning in user_warns:
+        warn(guild_id, new_user_id, warning.get('warner'),
              warning.get('warner_name'), warning.get('channel'), warning.get('reason'))
     try:
         mute = get_mute_status(guild_id, user_id)

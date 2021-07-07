@@ -6,6 +6,7 @@ import json
 import os
 from .errors import NoTempBansForGuild
 from .ext import parse_times
+from .types import TempbanEnd, TempbanState
 
 # If this whole extension looks familiar, it is: I basically just copy-pasted mute.py
 # and edited it to fit with temp-bans instead of mutes.
@@ -38,10 +39,10 @@ def check_bans(clear_bans=True):
         for to_unban in unbans.get(dt_string):
             guild_id = to_unban[1]
             user_id = to_unban[0]
-            unban_list.append({
+            unban_list.append(TempbanEnd().from_dict({
                 "guild_id": guild_id,
                 "user_id": user_id
-            })
+            }))
             if clear_bans:
                 to_clear.append([guild_id, user_id])
         if clear_bans:
@@ -98,12 +99,12 @@ def get_ban_status(guild_id: int, user_id: int):
     # user has been muted.
     ban_index = user_bans[2]
     ban_data = bans.get(user_bans[0])[ban_index]
-    return {
+    return TempbanState().from_dict({
         "unban_time": user_bans[0],
         "ban_author_id": user_bans[1],
         "ban_index": ban_index,
         "ban_data": ban_data
-    }
+    })
 
 
 def unban_user(guild_id: int, user_id: int):

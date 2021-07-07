@@ -178,3 +178,34 @@ class MuteEnd:
 
     def __getitem__(self, item):
         return getattr(self, item)
+
+
+class TempbanState:
+    unban_time = ""
+    ban_author_id = 0
+    index = 0
+    ban_data = [0, 0]
+
+    def from_dict(self, mute_dict: dict):
+        self.unban_time = mute_dict.get('unban_time')
+        self.ban_author_id = mute_dict.get('ban_author_id')
+        self.index = mute_dict.get('ban_index')
+        self.ban_data = mute_dict.get('ban_data')
+        return self
+
+    def __getitem__(self, item):
+        return getattr(self, item)
+
+
+class TempbanEnd:
+    """I have no other name ideas."""
+    guild_id = 0
+    user_id = 0
+
+    def from_dict(self, mute_dict: dict):
+        self.guild_id = mute_dict.get('guild_id')
+        self.user_id = mute_dict.get('user_id')
+        return self
+
+    def __getitem__(self, item):
+        return getattr(self, item)

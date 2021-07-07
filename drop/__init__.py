@@ -25,8 +25,8 @@ def licenses():
         {
             "name": "aiohttp",
             "license": "Apache 2.0",
-            "link": "https://github.com/aio-libs/aiohttp/blob/master/LICENSE.txt "
-                    "(http://www.apache.org/licenses/LICENSE-2.0)",
+            "link": "https://github.com/aio-libs/aiohttp/blob/master/LICENSE.txt ",
+            #         "(http://www.apache.org/licenses/LICENSE-2.0)",
             # The LICENSE.txt directs the user there anyways.
             "changes": "no changes made"
         },

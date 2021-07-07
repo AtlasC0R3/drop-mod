@@ -18,6 +18,7 @@ class Warn:
         self.reason = warn_dict['reason']
         self.channel = warn_dict['channel']
         self.datetime = warn_dict['datetime']
+        return self
 
     def to_dict(self):
         return {
@@ -36,6 +37,28 @@ class Warn:
     def get(self, item):
         # since some might still use dictionary.get()
         return self.__getitem__(item)
+
+
+class TodoItem:
+    description = ""
+    time = ""
+    author = 0
+
+    def to_dict(self):
+        return {
+            "desc":   self.description,
+            "time":   self.time,
+            "author": self.author
+        }
+
+    def __getitem__(self, item):
+        return getattr(self, item) if hasattr(self, item) else self.to_dict().get(item)
+
+    def from_dict(self, todo_dict: dict):
+        self.description = todo_dict.get('desc')
+        self.time = todo_dict.get('time')
+        self.author = todo_dict.get('author')
+        return self
 
 
 class _SearchField:

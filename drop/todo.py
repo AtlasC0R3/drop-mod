@@ -4,6 +4,8 @@ import os
 import json
 from datetime import datetime
 
+from .types import TodoItem
+
 DIR_PATH = "data/todo/"
 
 
@@ -27,21 +29,21 @@ def get_todos(user_id: int):
         with open(file_path, newline="\n", encoding='utf-8') as todo_file:
             todo_data = json.load(todo_file)
             # does the user have to-do stuff
-            # oh god pycharm things to-do without '-' is always a to-do thing to do
     except FileNotFoundError:
-        # nothing generated yet
+        # no
         init_todo(user_id=user_id)  # mess.
         todo_data = get_todos(user_id)  # this works
     except json.JSONDecodeError:
+        # yes but it's not right
         init_todo(user_id, True)
         todo_data = get_todos(user_id)
-        # God dammit. Had to reinitialize this.
-    return todo_data
+    # yes
+    return [TodoItem().from_dict(x) for x in todo_data]
 
 
 def get_todo(user_id: int, index: int):
     """Get a specific to-do item from a user's to-do list."""
-    return get_todos(user_id).get(index)
+    return get_todos(user_id)[index]
 
 
 def edit_todo(user_id: int, index: int, description: str):
@@ -90,7 +92,7 @@ def get_guild_todos(guild_id: int):
     try:
         with open(f"data/servers/{guild_id}/todo.json", newline="\n", encoding='utf-8') as \
                 todo_file:
-            return json.load(todo_file)
+            return [TodoItem().from_dict(x) for x in json.load(todo_file)]
     except FileNotFoundError:
         init_guild_todos(guild_id)
     except json.JSONDecodeError:

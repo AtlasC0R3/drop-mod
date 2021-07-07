@@ -209,3 +209,23 @@ class TempbanEnd:
 
     def __getitem__(self, item):
         return getattr(self, item)
+
+
+class UrbanDefinition:
+    word = ""
+    definition = ""
+    example = ""
+    url = ""
+    thumbs_up = 0
+    author = ""
+    time = ""
+
+    def from_dict(self, ud_dict: dict):
+        self.definition = ud_dict.get('definition')
+        self.url = ud_dict.get('permalink')
+        self.thumbs_up = ud_dict.get('thumbs_up')
+        self.author = ud_dict.get('author')
+        self.word = ud_dict.get('word')
+        self.time = ud_dict.get('written_on')
+        self.example = ud_dict.get('example')
+        return self

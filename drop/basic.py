@@ -5,7 +5,7 @@ but still are great commands that every bot should have.
 import random
 
 from . import ext
-from .types import Search, Lyrics
+from .types import Search, Lyrics, UrbanDefinition
 import aiohttp
 
 GENIUS = None
@@ -24,8 +24,8 @@ def owofy(string: str):
 
 async def search(to_search: str):
     """
-    Does a DuckDuckGo query. NOTE: does not return search results, only returns "Instant Answers".
-    I don't know how I can really explain this.
+    Searches for a query across 2 engines: DuckDuckGo (for Instant Answers) and Qwant
+    (for general search results).
     """
     engines = [lambda: ext.duckducksearch(to_search), lambda: ext.qwant_search(to_search)]
     result = None
@@ -36,6 +36,15 @@ async def search(to_search: str):
     if not result:
         return None
     return Search().from_dict(result) if isinstance(result, dict) else result
+
+
+async def ud_definition(to_search: str):
+    """
+    Searches for a definition on Urban Dictionary.
+    """
+    async with aiohttp.ClientSession() as session:
+        async with session.get(f"https://api.urbandictionary.com/v0/define?term={to_search}") as r:
+            return [UrbanDefinition().from_dict(x) for x in (await r.json())['list']]
 
 
 def init_genius(token):

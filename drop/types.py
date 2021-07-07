@@ -52,3 +52,32 @@ class Search:
         self.engine = search_result.get('engine')
         self.engine_icon = search_result.get('engine_icon')
         return self
+
+
+class Lyrics:
+    title = "Silence"
+    artist = "Nature"
+    url = ""
+    thumbnail = ""
+    source = "Nowhere"
+    source_icon = ""
+    lyrics = "Yeah, well, silence has no sound."
+
+    def __getitem__(self, item):
+        return getattr(self, item)
+
+    def get(self, item):
+        return self.__getitem__(item)
+
+    def from_dict(self, lyrics_dict: dict):
+        self.title = lyrics_dict.get('title')
+        self.artist = lyrics_dict.get('artist')
+        self.url = lyrics_dict.get('url')
+        self.thumbnail = lyrics_dict.get('song_art_image_url')
+        self.lyrics = lyrics_dict.get('lyrics')
+        return self
+
+    def set_source(self, name: str, icon: str):
+        self.source = name
+        self.source_icon = icon
+        return self

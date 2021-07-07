@@ -55,10 +55,19 @@ async def lyrics(query: str):
             if r.status == 400:
                 print("Genius API token probably not working")
             results = (await r.json())['response']['hits']
-            try:
-                song_result = results[0]['result']
-            except IndexError:
+            song_result = None
+            for song in results:
+                if song['result']['primary_artist']['name'] in ext.genius_system_artists:
+                    pass
+                else:
+                    song_result = song['result']
+                    break
+            if not song_result:
                 return None
+            # try:
+            #     song_result = results[0]['result']
+            # except IndexError:
+            #     return None
     song_path = f"https://genius.com{song_result['path']}"
 
     song = Lyrics()

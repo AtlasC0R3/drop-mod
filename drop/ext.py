@@ -214,3 +214,6 @@ async def genius_get_lyrics(url: str):
                         .find("div", class_="lyrics").get_text()
                 except AttributeError:
                     return await genius_get_lyrics(url)
+
+
+genius_system_artists = ('Genius', 'Spotify')

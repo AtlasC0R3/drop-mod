@@ -22,15 +22,15 @@ def owofy(string: str):
     return string
 
 
-def search(to_search: str):
+async def search(to_search: str):
     """
-    Does a DuckDuckPy query. NOTE: does not return search results, only returns queries.
+    Does a DuckDuckGo query. NOTE: does not return search results, only returns "Instant Answers".
     I don't know how I can really explain this.
     """
     engines = [lambda: ext.duckducksearch(to_search), lambda: ext.qwant_search(to_search)]
     result = None
     for engine in engines:
-        result = engine()
+        result = await engine()
         if result:
             break
     if not result:

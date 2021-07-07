@@ -78,7 +78,8 @@ to_replace = {
     '</b>': '**',
     '<p>': '\n**',
     '</p>': '**\n',
-    '</li>': '\n'
+    '</li>': '\n',
+    '&amp;': '&'
 }
 
 protondb_colors = {"Platinum": 0xB7C9DE, "Gold": 0xCFB526, "Silver": 0xC1C1C1, "Bronze": 0xCB7F22,
@@ -136,32 +137,38 @@ def parse_times(datetime_to_parse: str):
     return str_dt_obj
 
 
-def duckducksearch(to_search: str):
-    response = duckduckpy.query(to_search, user_agent=u'duckduckpy 0.2', no_redirect=False,
-                                no_html=True, skip_disambig=True)
-    if response.abstract:
+async def duckducksearch(to_search: str):
+    # response = duckduckpy.query(to_search, user_agent=u'duckduckpy 0.2', no_redirect=False,
+    #                             no_html=True, skip_disambig=True)
+    # https://api.duckduckgo.com/?q=DuckDuckGo&format=json&pretty=1
+    async with aiohttp.ClientSession(headers={'User-Agent': f'drop-mod {version}'}) as session:
+        async with session.get(
+                # f"https://api.qwant.com/api/search/web?count=10&offset=0&q={to_search}"
+                f"https://api.duckduckgo.com/?q={to_search}&format=json&no_html=1") as r:
+            response = await r.json(content_type=None)
+    if response['Abstract']:
         infobox = []
         is_infobox = False
         image = None
-        if response.infobox:
-            infobox = response.infobox['content']
+        if response['Infobox']:
+            infobox = response['Infobox']['content']
             is_infobox = True
-        if response.image:
-            response_image = response.image
+        if response['Image']:
+            response_image = response['Image']
             image = f'https://duckduckgo.com{response_image}' \
                 if response_image.startswith('/') else response_image
         result = {
-            "title": response.heading,
-            "description": format_html(response.abstract_text),
-            "url": response.abstract_url,
-            "source": response.abstract_source,
+            "title": response['Heading'],
+            "description": format_html(response['AbstractText']),
+            "url": response['AbstractURL'],
+            "source": response['AbstractSource'],
             "image": image,
             "fields": [{
                 'name': x['label'],
                 'value': ''.join(list(x['value'])[:253]) + '...' if len(x) >= 256 else x['value']
             } for x in infobox if x['data_type'] == 'string'],
             "infobox": is_infobox,
-            "engine": "DuckDuckGo (via DuckDuckPy)",
+            "engine": "DuckDuckGo",
             "engine_icon": "https://duckduckgo.com/assets/icons/meta/DDG-icon_256x256.png"
         }
     else:
@@ -169,14 +176,22 @@ def duckducksearch(to_search: str):
     return result
 
 
-def qwant_search(to_search: str):
-    response = requests.get(
-        f"https://api.qwant.com/api/search/web?count=10&offset=0&q={to_search}"
-        f"&t=web"
-        f"&uiv=1"
-        f"&safesearch=2"
-        f"&locale=en_US",
-        headers={'User-Agent': f'drop-mod {version}'}).json()
+async def qwant_search(to_search: str):
+    # response = requests.get(
+    #     f"https://api.qwant.com/api/search/web?count=10&offset=0&q={to_search}"
+    #     f"&t=web"
+    #     f"&uiv=1"
+    #     f"&safesearch=2"
+    #     f"&locale=en_US",
+    #     headers={'User-Agent': f'drop-mod {version}'}).json()
+    async with aiohttp.ClientSession(headers={'User-Agent': f'drop-mod {version}'}) as session:
+        async with session.get(
+                f"https://api.qwant.com/api/search/web?count=10&offset=0&q={to_search}"
+                f"&t=web"
+                f"&uiv=1"
+                f"&safesearch=2"
+                f"&locale=en_US") as r:
+            response = await r.json()
     items = response['data']['result']['items']
     if not items:
         return None

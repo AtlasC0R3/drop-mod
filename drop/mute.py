@@ -4,6 +4,7 @@ from datetime import datetime
 import json
 from .errors import NoMutesForGuild, NoMutesForUser
 from .ext import parse_times
+from .types import MuteState, MuteEnd
 
 import parsedatetime
 cal = parsedatetime.Calendar()
@@ -21,7 +22,7 @@ def check_mutes(get_role=True, clear_mutes=True):
         unmutes = json.load(file)
     if dt_string in unmutes:
         # we have stuff to do
-        # DON'T TAKE THE WORDS "TO DO" WITH THE SAME DEFINITION AS BONK
+        # DON'T TAKE THE WORDS "TO DO" WITH THE SAME DEFINITION AS BONK'S BRITISH DEFINITION
         for to_unmute in unmutes.get(dt_string):
             guild_id = to_unmute[2]
             if get_role:
@@ -29,11 +30,11 @@ def check_mutes(get_role=True, clear_mutes=True):
             else:
                 role_id = None
             user_id = to_unmute[0]
-            unmute_list.append({
+            unmute_list.append(MuteEnd().from_dict({
                 "guild_id": guild_id,
                 "role_id": role_id,
                 "user_id": user_id
-            })
+            }))
             if clear_mutes:
                 to_clear.append([guild_id, user_id])
         if clear_mutes:
@@ -91,13 +92,13 @@ def get_mute_status(guild_id: int, user_id: int):
     mute_index = user_mutes[2]
     mute_data = mutes.get(user_mutes[0])[mute_index]
     mute_role_id = mute_data[1]
-    return {
+    return MuteState().from_dict({
         "unmute_time": user_mutes[0],
         "mute_author_id": user_mutes[1],
         "mute_index": mute_index,
         "mute_data": mute_data,
         "mute_role_id": mute_role_id
-    }
+    })
 
 
 def get_mutes():
@@ -115,9 +116,9 @@ def unmute_user(guild_id: int, user_id: int):
     mutes = get_mutes()
     guild_mutes = mutes.get(str(guild_id))
     user_mute = get_mute_status(guild_id, user_id)
-    mute_time = user_mute["unmute_time"]
-    mute_index = user_mute["mute_index"]
-    mute_role_id = user_mute["mute_role_id"]
+    mute_time = user_mute.unmute_time
+    mute_index = user_mute.mute_index
+    mute_role_id = user_mute.mute_role_id
     mutes.get(mute_time).pop(mute_index)
     if not mutes.get(mute_time):
         mutes.pop(mute_time)

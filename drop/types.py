@@ -144,3 +144,37 @@ class Lyrics:
         self.source = name
         self.source_icon = icon
         return self
+
+
+class MuteState:
+    unmute_time = ""
+    mute_author_id = 0
+    index = 0
+    mute_data = [0, 0, 0]
+    role_id = 0
+
+    def from_dict(self, mute_dict: dict):
+        self.unmute_time = mute_dict.get('unmute_time')
+        self.mute_author_id = mute_dict.get('mute_author_id')
+        self.index = mute_dict.get('mute_index')
+        self.mute_data = mute_dict.get('mute_data')
+        return self
+
+    def __getitem__(self, item):
+        return getattr(self, item)
+
+
+class MuteEnd:
+    """I have no other name ideas."""
+    guild_id = 0
+    role_id = 0
+    user_id = 0
+
+    def from_dict(self, mute_dict: dict):
+        self.guild_id = mute_dict.get('guild_id')
+        self.role_id = mute_dict.get('role_id')
+        self.user_id = mute_dict.get('user_id')
+        return self
+
+    def __getitem__(self, item):
+        return getattr(self, item)

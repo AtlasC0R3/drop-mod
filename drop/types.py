@@ -12,6 +12,7 @@ class Warn:
     datetime = ""
 
     def from_dict(self, warn_dict: dict):
+        self.warner = Moderator()
         self.warner.id = warn_dict['warner']
         self.warner.name = warn_dict['warner_name']
         self.reason = warn_dict['reason']

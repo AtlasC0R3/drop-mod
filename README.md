@@ -43,10 +43,8 @@ owofy("The quick brown fox jumps over the lazy dog.")
 ### Dependencies
 **None of these packages listed below are included directly into this software!** They are only installed from [PyPI](https://pypi.org/) when running `setup.py`!
 
-[duckduckpy](https://github.com/ivankliuk/duckduckpy/), licensed under [MIT License](https://github.com/ivankliuk/duckduckpy/blob/master/LICENSE)
-
-[LyricsGenius](https://github.com/johnwmillr/LyricsGenius/), licensed under [MIT License](https://github.com/johnwmillr/LyricsGenius/blob/master/LICENSE.txt)
-
 [Parsedatetime](https://github.com/bear/parsedatetime/), licensed under [Apache 2.0](https://github.com/bear/parsedatetime/blob/master/LICENSE.txt)
 
-[requests](https://github.com/psf/requests), licensed under [Apache 2.0](https://github.com/psf/requests/blob/master/LICENSE)
+[aiohttp](https://github.com/aio-libs/aiohttp/), licensed under [Apache 2.0](https://github.com/aio-libs/aiohttp/blob/master/LICENSE.txt)
+
+[BeautifulSoup](https://www.crummy.com/software/BeautifulSoup/), licensed under [MIT License](https://mit-license.org/)

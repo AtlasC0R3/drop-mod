@@ -47,6 +47,24 @@ async def ud_definition(to_search: str):
             return [UrbanDefinition().from_dict(x) for x in (await r.json())['list']]
 
 
+async def ud_random():
+    """
+    Gets a random word definition on Urban Dictionary.
+    """
+    async with aiohttp.ClientSession() as session:
+        async with session.get(f"https://api.urbandictionary.com/v0/random") as r:
+            return UrbanDefinition().from_dict(random.choice((await r.json())['list']))
+
+
+async def cat_image():
+    """
+    Fetches an URL of a random cat image.
+    """
+    async with aiohttp.ClientSession() as session:
+        async with session.get("https://aws.random.cat/meow") as r:
+            return (await r.json())['file']
+
+
 def init_genius(token):
     """
     Initializes Genius' lyrics command (such as get_lyrics() or get_artist()).

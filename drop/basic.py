@@ -65,6 +65,15 @@ async def cat_image():
             return (await r.json())['file']
 
 
+async def dog_image():
+    """
+    Fetches an URL of a random dog image.
+    """
+    async with aiohttp.ClientSession() as session:
+        async with session.get("https://dog.ceo/api/breeds/image/random") as r:
+            return (await r.json())['message']
+
+
 def init_genius(token):
     """
     Initializes Genius' lyrics command (such as get_lyrics() or get_artist()).

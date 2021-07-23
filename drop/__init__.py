@@ -5,7 +5,7 @@ A Python moderation toolkit built for chat bots
 __version__ = "2.0.1"
 
 
-def licenses():
+def licenses(markdown_links=False):
     """
     Returns all of the licenses for drop-mod's dependencies.
     """
@@ -38,19 +38,17 @@ def licenses():
             # I'll gladly correct that error.
             "changes": "no changes made"
         }
-        # {
-        #     "name": "Dear PyGui",
-        #     "license": "MIT License",
-        #     "link": "https://github.com/hoffstadt/DearPyGui/blob/master/LICENSE",
-        #     "changes": None
-        # } isn't *really* in drop's core
     ]
     # If you installed these from PyPI directly (or just ran setup.py or pip to install this), then
     # no changes have been made, so you don't need to stress out about that.
     license_str = ""
     for dep in license_list:
-        to_add = f"{dep['name']}, licensed under {dep['license']}"
+        to_add = f"{dep['name']}, licensed under "
+        if markdown_links:
+            to_add += f" [{dep['license']}]({dep['link']})"
+        else:
+            to_add += f"{dep['license']} ({dep['link']})"
         if dep['changes']:
-            to_add = to_add + ", " + dep['changes']
-        license_str = license_str + to_add + f" ({dep['link']})\n"
+            to_add += ", " + dep['changes'] + "\n"
+        license_str += to_add
     return license_str

@@ -22,8 +22,10 @@ def init_todo(user_id: int, force_init=False):
             json.dump(todo_data, todo_file)
 
 
-def get_todos(user_id: int):
-    """Get the specified user's to-dos."""
+def get_raw_todos(user_id: int):
+    """
+    Returns the raw to-do JSON dictionary-ish.
+    """
     file_path = DIR_PATH + f"{user_id}.json"
     try:
         with open(file_path, newline="\n", encoding='utf-8') as todo_file:
@@ -32,12 +34,17 @@ def get_todos(user_id: int):
     except FileNotFoundError:
         # no
         init_todo(user_id=user_id)  # mess.
-        todo_data = get_todos(user_id)  # this works
+        todo_data = get_raw_todos(user_id)  # this works
     except json.JSONDecodeError:
         # yes but it's not right
         init_todo(user_id, True)
-        todo_data = get_todos(user_id)
-    # yes
+        todo_data = get_raw_todos(user_id)
+    return todo_data
+
+
+def get_todos(user_id: int):
+    """Get the specified user's to-dos."""
+    todo_data = get_raw_todos(user_id)
     return [TodoItem().from_dict(x) for x in todo_data]
 
 
@@ -48,7 +55,7 @@ def get_todo(user_id: int, index: int):
 
 def edit_todo(user_id: int, index: int, description: str):
     """Edit a user's to-do item."""
-    todo_data = get_todos(user_id)
+    todo_data = get_raw_todos(user_id)
     new_todo = {
         'desc': description,
         'time': datetime.now().strftime('%d/%m/%Y %H:%M:%S')
@@ -60,7 +67,7 @@ def edit_todo(user_id: int, index: int, description: str):
 
 def add_todo(user_id: int, description: str):
     """Append a to-do item to a user's to-do list."""
-    todo_data = get_todos(user_id)
+    todo_data = get_raw_todos(user_id)
     new_todo = {
         'desc': description,
         'time': datetime.now().strftime("%d/%m/%Y %H:%M:%S")
@@ -73,7 +80,7 @@ def add_todo(user_id: int, description: str):
 
 def rm_todo(user_id: int, index: int):
     """Remove a to-do item from a user's to-do list."""
-    todo_data = get_todos(user_id)
+    todo_data = get_raw_todos(user_id)
     try:
         todo_data.pop(index)
     except IndexError as exception:
@@ -87,12 +94,17 @@ def rm_todo(user_id: int, index: int):
 # guild stuff
 
 
+def get_raw_guild_todos(guild_id: int):
+    """Gets raw to-dos in a dictionary format."""
+    with open(f"data/servers/{guild_id}/todo.json", newline="\n", encoding='utf-8') as \
+            todo_file:
+        return json.load(todo_file)
+
+
 def get_guild_todos(guild_id: int):
     """Gets every to-dos from a guild."""
     try:
-        with open(f"data/servers/{guild_id}/todo.json", newline="\n", encoding='utf-8') as \
-                todo_file:
-            return [TodoItem().from_dict(x) for x in json.load(todo_file)]
+        return [TodoItem().from_dict(x) for x in get_raw_guild_todos(guild_id)]
     except FileNotFoundError:
         init_guild_todos(guild_id)
     except json.JSONDecodeError:
@@ -115,7 +127,7 @@ def init_guild_todos(guild_id: int, force_init=False):
 
 def rm_guild_todo(guild_id: int, index: int):
     """Remove a to-do item from a guild's to-do list."""
-    todo_data = get_guild_todos(guild_id)
+    todo_data = get_raw_guild_todos(guild_id)
     try:
         todo_data.pop(index)
     except IndexError as exception:
@@ -132,7 +144,7 @@ def rm_guild_todo(guild_id: int, index: int):
 
 def add_guild_todo(guild_id: int, description: str, author_id: int):
     """Add a to-do item to a guild's to-do list."""
-    todo_data = get_guild_todos(guild_id)
+    todo_data = get_raw_guild_todos(guild_id)
     new_todo = {
         'desc': description,
         'time': datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
@@ -147,7 +159,7 @@ def add_guild_todo(guild_id: int, description: str, author_id: int):
 
 def edit_guild_todo(guild_id: int, index: int, description: str):
     """Edit a to-do item from a guild's to-do list."""
-    todo_data = get_guild_todos(guild_id)
+    todo_data = get_raw_guild_todos(guild_id)
     new_todo = {
         'desc': description,
         'time': datetime.now().strftime('%d/%m/%Y %H:%M:%S'),

@@ -234,9 +234,9 @@ async def random_tumblr_image(blog_name: str):
     if post_dict['type'] != 'regular':
         return await random_tumblr_image(blog_name)
     post.image = re.findall(r"img src=\"(.*?)\"", post_dict['regular-body'])[0]
-    description = re.findall(r"<\\/figure><p>(.*?)<\\/p>", post_dict['regular-body'])
+    description = re.findall(r"</figure><p>(.*?)</p>", post_dict['regular-body'])
     if description:
-        post.description = description
+        post.description = description[0]
     post.datetime = datetime.fromtimestamp(post_dict['unix-timestamp'])
     post.url = post_dict['url']
     post.blogger.from_dict(post_dict['tumblelog'])

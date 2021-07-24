@@ -1,15 +1,16 @@
 """Extra functions for drop-mod that I didn't think would fit anywhere else."""
-
+import random
 import re
 from datetime import datetime
 
 from .errors import InvalidTimeParsed, PastTimeError, PresentTimeError
 from . import __version__ as version
-from .types import Search, _SearchField
+from .types import Search, _SearchField, TumblrImages
 
 from bs4 import BeautifulSoup
 import parsedatetime
 import aiohttp
+from json import loads
 
 cal = parsedatetime.Calendar()
 
@@ -79,7 +80,8 @@ to_replace = {
     '<p>': '\n**',
     '</p>': '**\n',
     '</li>': '\n',
-    '&amp;': '&'
+    '&amp;': '&',
+    '&rsquo;': '\''
 }
 
 protondb_colors = {"Platinum": 0xB7C9DE, "Gold": 0xCFB526, "Silver": 0xC1C1C1, "Bronze": 0xCB7F22,
@@ -90,8 +92,7 @@ def format_html(str_input: str):
     """Removes any HTML formatting from a string."""
     for old, new in to_replace.items():
         str_input = str_input.replace(old, new)
-    regex_thing = re.compile(r'<.*?>')
-    return regex_thing.sub('', str_input)
+    return re.sub(r'<.*?>', '', str_input)
 
 
 def format_names(name_list: list):
@@ -214,6 +215,32 @@ async def genius_get_lyrics(url: str):
                         .find("div", class_="lyrics").get_text()
                 except AttributeError:
                     return await genius_get_lyrics(url)
+
+
+async def get_random_tumblr_post(blog_name: str):
+    async with aiohttp.ClientSession() as session:
+        async with session.get(f'https://{blog_name}.tumblr.com/api/read/json') as r:
+            if not r.status == 200:
+                return
+            tumblr_blog = loads((await r.text()).replace("var tumblr_api_read = ", "")
+                                .replace(";\n", ""))
+            # all of the replace statements here are to eliminate the javascript variable stuff.
+            return random.choice(tumblr_blog['posts'])
+
+
+async def random_tumblr_image(blog_name: str):
+    post_dict = await get_random_tumblr_post(blog_name=blog_name)
+    post = TumblrImages()
+    if post_dict['type'] != 'regular':
+        return await random_tumblr_image(blog_name)
+    post.image = re.findall(r"img src=\"(.*?)\"", post_dict['regular-body'])[0]
+    description = re.findall(r"<\\/figure><p>(.*?)<\\/p>", post_dict['regular-body'])
+    if description:
+        post.description = description
+    post.datetime = datetime.fromtimestamp(post_dict['unix-timestamp'])
+    post.url = post_dict['url']
+    post.blogger.from_dict(post_dict['tumblelog'])
+    return post
 
 
 genius_system_artists = ('Genius', 'Spotify', 'Ego Trip Magazine')

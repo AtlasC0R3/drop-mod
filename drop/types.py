@@ -1,3 +1,6 @@
+from datetime import datetime
+
+
 class Moderator:
     """Someone who moderates. Has an ID and name for the moderator."""
     id = 0
@@ -229,3 +232,26 @@ class UrbanDefinition:
         self.time = ud_dict.get('written_on')
         self.example = ud_dict.get('example')
         return self
+
+
+class TumblrBlog:
+    title = ""
+    name = ""
+    url = ""
+    avatar = ""
+
+    def from_dict(self, tumblelog: dict):
+        self.title = tumblelog.get('title')
+        self.name = tumblelog.get('name')
+        self.url = tumblelog.get('url')
+        self.avatar = tumblelog.get('avatar_url_512')
+        return self
+
+
+class TumblrImages:
+    post_id = ""
+    url = ""
+    datetime = datetime
+    image = ""
+    description = ""
+    blogger = TumblrBlog()

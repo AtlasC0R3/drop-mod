@@ -61,8 +61,11 @@ async def cat_image():
     Fetches an URL of a random cat image.
     """
     async with aiohttp.ClientSession() as session:
-        async with session.get("https://aws.random.cat/meow") as r:
-            return (await r.json())['file']
+        async with session.get('https://aws.random.cat/meow') as r:
+            try:
+                return (await r.json())['file']
+            except aiohttp.ContentTypeError:
+                return await cat_image()
 
 
 async def dog_image():

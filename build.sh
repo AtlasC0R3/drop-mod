@@ -52,8 +52,8 @@ if $install; then
   echo "installing drop using pip"
   echo "---------------------------"
   if $reinstall; then
-    python3 -m pip install dist/drop_mod-*.whl --force-reinstall
+    python3 -m pip install dist/drop_mod-*.whl --user --force-reinstall
   else
-    python3 -m pip install dist/drop_mod-*.whl
+    python3 -m pip install dist/drop_mod-*.whl --user
   fi
 fi

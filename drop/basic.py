@@ -7,6 +7,7 @@ import random
 from . import ext
 from .types import Search, Lyrics, UrbanDefinition
 import aiohttp
+import json
 
 GENIUS = None
 
@@ -63,8 +64,9 @@ async def cat_image():
     async with aiohttp.ClientSession() as session:
         async with session.get('https://aws.random.cat/meow') as r:
             try:
-                return (await r.json())['file']
-            except aiohttp.ContentTypeError:
+                return json.loads(await r.read())['file']
+            except json.JSONDecodeError:
+                # fucking hell this API isn't always reliable and might not always return something
                 return await cat_image()
 
 

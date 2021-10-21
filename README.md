@@ -33,6 +33,9 @@ owofy("The quick brown fox jumps over the lazy dog.")
 ```
 
 ## F.A.Q.
+### Q: Is this project abandoned?
+**A:** **Yes.** This project is really low in my priorities.
+
 ### Q: Are there any open images for this project?
 **A:** Yes, [they are updated in a Gitdab repository](https://gitdab.com/atlas_core/drop-misc/src/branch/master/images). *[License link](https://gitdab.com/atlas_core/drop-misc/src/branch/master/images/license.txt)*
 ### Q: Can I use this for my own projects?

@@ -228,7 +228,7 @@ async def genius_get_lyrics(url: str):
 
 
 async def get_random_tumblr_post(blog_name: str):
-    async with aiohttp.ClientSession() as session:
+    async with aiohttp.ClientSession(headers={'User-Agent': f'drop-mod {version}'}) as session:
         async with session.get(f'https://{blog_name}.tumblr.com/api/read/json') as r:
             if not r.status == 200:
                 return

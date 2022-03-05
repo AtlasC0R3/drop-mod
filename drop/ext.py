@@ -211,8 +211,18 @@ async def genius_get_lyrics(url: str):
         async with session.get(url) as r:
             if r.status == 200:
                 try:
-                    return BeautifulSoup(await r.text(), "html.parser") \
-                        .find("div", class_="lyrics").get_text()
+                    # html = BeautifulSoup(
+                    #     self._make_request(path, web=True).replace('<br/>', '\n'),
+                    #     "html.parser"
+                    # )
+                    html = BeautifulSoup((await r.text()).replace('<br/>', '\n'), "html.parser")
+                    div = html.find("div", class_=re.compile("^lyrics$|Lyrics__Root"))
+                    if div is None:
+                        return "The song probably does not have any lyrics."
+                    return div.get_text()
+                    # return BeautifulSoup(await r.text(), "html.parser") \
+                    #     .find("div", class_=re.compile("^lyrics$|Lyrics__Root")).get_text()
+                    # will not return any newlines. at all.
                 except AttributeError:
                     return await genius_get_lyrics(url)
 

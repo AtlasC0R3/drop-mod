@@ -5,7 +5,7 @@ python --version 3>NUL
 if errorlevel 1 goto errorNoPython
 
 py -m pip uninstall drop-mod -y
-py setup.py install
+py setup.py install --user
 
 goto:eof
 

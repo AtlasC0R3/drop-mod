@@ -8,7 +8,6 @@ from . import ext
 from .types import Search, Lyrics, UrbanDefinition
 import aiohttp
 import json
-import re
 
 GENIUS = None
 
@@ -117,7 +116,14 @@ async def lyrics(query: str):
     song.title = song_result["title"]
 
     extracted_lyrics = (await ext.genius_get_lyrics(song_path)).replace(f"{song.title} Lyrics", '')
-    extracted_lyrics = re.sub(r"([0-9]|[0-9][0-9])Embed", "", extracted_lyrics)
+    # extracted_lyrics = re.sub(r"([0-9]|[0-9][0-9])Embed", "", extracted_lyrics)  Preliminary BS.
+
+    if extracted_lyrics.endswith('Embed'):
+        pyongs = song_result['pyongs_count']
+        if pyongs:
+            extracted_lyrics = extracted_lyrics.replace(f"{song_result['pyongs_count']}Embed", '')
+        else:
+            extracted_lyrics = extracted_lyrics[:-5]
 
     song.lyrics = extracted_lyrics
     song.artist = song_result["primary_artist"]["name"]
